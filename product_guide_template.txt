@@ -1,0 +1,24 @@
+# UNITED FORMULAS PRODUCT MASTER GUIDE
+# This file serves as the primary "Knowledge Base" for the UF Chemist AI.
+# Structure: [Product Name] | [Primary Use] | [Dilution/Protocols] | [Related SDS File]
+
+## FLOOR CARE SYSTEM
+Delta Green | Non-slip floor cleaner for restaurants and industrial kitchens. | 2-4 oz per gallon of hot water. No rinse required. | SDS-DeltaGreen.pdf
+Floor Stripper X-treme | Heavy-duty wax and finish remover. | 1:4 dilution for heavy buildup. Use cold water. | SDS-FloorStripperX.pdf
+Seal-Tech Gloss | High-traffic floor finish and sealant. | Apply thin even coats. Allow 45 min drying time. | SDS-SealTech.pdf
+
+## DEGREASERS & INDUSTRIAL CLEANERS
+R&R Degreaser | Rapid Response heavy-duty industrial degreaser. | 1:10 for engines, 1:40 for general shop floors. | SDS-RR-Degreaser.pdf
+Orange-Citrus Pro | Natural terpene-based solvent for grease and adhesives. | Use full strength for adhesives, 1:20 for cleaning. | SDS-OrangeCitrus.pdf
+Safety-Solve | Non-flammable parts cleaner and electronic degreaser. | Use as a soak or spray. Do not dilute. | SDS-SafetySolve.pdf
+
+## SANITATION & DISINFECTION
+Quat-Stop 4 | Hospital-grade disinfectant and sanitizer. | 1 oz per gallon for disinfection. 1:512 dilution. | SDS-QuatStop4.pdf
+Chlor-Active | Concentrated bleach-based sanitizer for food surfaces. | 200ppm for food contact surfaces. | SDS-ChlorActive.pdf
+
+## SPECIALTY CHEMICALS
+Lube-Tech | Food-grade lubricant for processing machinery. | Apply as needed to moving parts. | SDS-LubeTech.pdf
+Eco-Wash | Environmentally friendly vehicle and truck wash. | 1:100 for pressure washers. | SDS-EcoWash.pdf
+
+# NOTE TO AI: If a user describes a problem (e.g., "grease on a shop floor"), 
+# cross-reference the [Primary Use] column to suggest the best product.

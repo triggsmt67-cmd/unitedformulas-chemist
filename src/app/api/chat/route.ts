@@ -116,10 +116,11 @@ export async function POST(req: NextRequest) {
       1. TECHNICAL/SAFETY: If the user asks about safety, use, or first aid (e.g. "When should I not use this?") but NO product has been named in the current message OR the RECENT CONTEXT, return "CLARIFY".
       2. If a product like "Ace" or "Bath Butler" is mentioned (in message OR context), pick its grounding file from the list.
       3. If a product is mentioned but is NOT in the guide or file list, return "NONE".
-      4. Use the PRODUCT GUIDE to map names to technical files.
-      5. If asking for RECOMMENDATIONS, return "GUIDE".
-      6. If asking about DELIVERY, return "DELIVERY".
-      7. RETURN ONLY THE FILENAME or "GUIDE" or "DELIVERY" or "CLARIFY" or "NONE".
+      4. If the question is off-topic, personal, or unrelated to chemicals, products, or delivery (e.g., "What time is it?" or "Who won the game?"), return "GENERAL".
+      5. Use the PRODUCT GUIDE to map names to technical files.
+      6. If asking for RECOMMENDATIONS, return "GUIDE".
+      7. If asking about DELIVERY, return "DELIVERY".
+      8. RETURN ONLY THE FILENAME or "GUIDE" or "DELIVERY" or "CLARIFY" or "NONE" or "GENERAL".
     `;
 
         const selectionResult = await modelFlash.generateContent(selectionPrompt);
@@ -160,7 +161,9 @@ export async function POST(req: NextRequest) {
             const reversedHistory = [...history].reverse();
             const lastUserMsg = reversedHistory.find((msg: any) => msg.role === 'user')?.content || "";
             contextData = `STATUS: UNKNOWN PRODUCT. The user mentioned "${lastUserMsg}", but we do not have a technical record for it. Acknowledge this name specifically and offer general guidance.`;
-        } else if (selectedFile !== 'NONE' && selectedFile.length > 0) {
+        } else if (selectedFile === 'GENERAL') {
+            contextData = `STATUS: OUT OF SCOPE. The user's question is unrelated to chemistry, products, or delivery. Politely acknowledge that as a chemical safety assistant, you don't have access to that information, but offer to help with anything related to United Formulas.`;
+        } else if (selectedFile !== 'NONE' && selectedFile !== 'GENERAL' && selectedFile.length > 0) {
             contextData = `STATUS: PRODUCT IDENTIFIED.`;
             try {
                 const fileRecord = files.find((f: any) => f.name === selectedFile);
@@ -248,8 +251,9 @@ export async function POST(req: NextRequest) {
       ────────────────────────────────
       1. STATUS: NO PRODUCT NAMED. If you see this status in the retrieved data, ask: "I'd love to help with that! Which United Formulas product are you using or considering?"
       2. STATUS: UNKNOWN PRODUCT. If you see this status, say: "I don't have the technical record for [Product Name] in my vault yet, but I can offer general safety guidance."
-      3. STATUS: PRODUCT IDENTIFIED. If you see a "TECHNICAL RECORD", answer specifically.
-      4. ALWAYS include: "NOTE: In a medical emergency, call 911 or your local poison control center immediately."
+      3. STATUS: OUT OF SCOPE. If you see this status, be very friendly but clear: "I'm sorry, I don't have access to that information in my laboratory vault! I'm specifically trained to help with chemical safety and product info. Is there something brand-related I can help you with?"
+      4. STATUS: PRODUCT IDENTIFIED. If you see a "TECHNICAL RECORD", answer specifically.
+      5. ALWAYS include: "NOTE: In a medical emergency, call 911 or your local poison control center immediately."
 
       ────────────────────────────────
       DELIVERY & ZIPCODES:

@@ -11,7 +11,7 @@ export default function ChatWidget() {
     const [messages, setMessages] = useState<{ role: 'user' | 'assistant'; content: string; timestamp: string }[]>([
         {
             role: 'assistant',
-            content: 'Welcome to the Lab Portal. I am Dr. Aris. How can I assist with your SDS requests or molecular safety data today?',
+            content: "I am Dr. Aris. I'm here to help you get clear, safe answers about our products—and I'll slow things down if details really matter.",
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         }
     ]);
@@ -66,7 +66,7 @@ export default function ChatWidget() {
             console.error('Chat error:', error);
             setMessages(prev => [...prev, {
                 role: 'assistant',
-                content: 'I apologize, but the laboratory uplink encountered an error. Please try again.',
+                content: "Oops! Something went wrong on my end. Let's try that again.",
                 timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             }]);
         } finally {
@@ -78,7 +78,7 @@ export default function ChatWidget() {
         setMessages([
             {
                 role: 'assistant',
-                content: 'Welcome to the Lab Portal. I am Dr. Aris. How can I assist with your SDS requests or molecular safety data today?',
+                content: "I am Dr. Aris. I'm here to help you get clear, safe answers about our products—and I'll slow things down if details really matter.",
                 timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             }
         ]);
@@ -217,7 +217,7 @@ export default function ChatWidget() {
                                     type="text"
                                     value={input}
                                     onChange={(e) => setInput(e.target.value)}
-                                    placeholder="Request SDS for a chemical..."
+                                    placeholder="Ask me anything about our products..."
                                     className="w-full h-14 pl-6 pr-14 rounded-2xl border-none bg-slate-50 text-slate-900 placeholder:text-slate-400 text-sm focus:ring-2 focus:ring-slate-900/5 transition-all"
                                 />
                                 <button
@@ -241,7 +241,7 @@ export default function ChatWidget() {
                                     </span>
                                 </div>
                                 <p className="text-[10px] text-slate-400 font-medium text-center px-4 leading-tight">
-                                    The chemist can make mistakes, so double-check it or call sales for more information
+                                    AI-generated for informational use. The product label and SDS are the final authorities on safety and usage. Always verify with our team before proceeding.
                                 </p>
                             </div>
                         </div>

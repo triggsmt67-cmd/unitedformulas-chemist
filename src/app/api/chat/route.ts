@@ -107,7 +107,13 @@ export async function POST(req: NextRequest) {
         if (selectedFile === 'GUIDE') {
             contextData = `FULL PRODUCT CATALOG & MAPPING GUIDE:\n${productGuide}`;
         } else if (selectedFile === 'DELIVERY') {
-            contextData = `DELIVERY & SHIPPING CONTEXT:\n${zipcodes ? `VALID DELIVERY ZIPCODES:\n${zipcodes}` : "No specific zipcode data found."}\n\nGENERAL POLICY: We aim to ship all orders the next day. Local delivery is standard same/next day.`;
+            const parsedZips = zipcodes ? JSON.parse(zipcodes) : [];
+            const zipList = parsedZips.map((z: any) => `${z.zip}: ${z.city} (${z.county})`).join('\n');
+            contextData = `DELIVERY & SHIPPING CONTEXT:
+            VALID DELIVERY LOCATIONS:
+            ${zipList || "No specific zipcode data found."}
+
+            GENERAL POLICY: We aim to ship all orders the next day. Local delivery is standard same/next day. Our main routes cover Great Falls and Billings regions.`;
         } else if (selectedFile !== 'NONE' && selectedFile.length > 0) {
             try {
                 // Exact match check
@@ -145,9 +151,11 @@ export async function POST(req: NextRequest) {
       4. BE CONCISE. Use bullet points and keep paragraphs short.
 
       DELIVERY & ZIPCODES:
-      - If the user provides a zipcode and it is FOUND in the list, confirm we deliver there!
-      - If the user provides a zipcode and it is NOT in the list, or if they ask about delivery and don't provide a zipcode, say: "Please contact support for specific shipping details and routes."
-      - Generally, we delivery to the Great Falls and Billings areas.
+      - If the user asks about delivery but provides no location: Tell them "Yes, we do!" and ask for their city or zip code so you can check.
+      - If they provide a zip or city: CHECK THE "VALID DELIVERY LOCATIONS" LIST. 
+      - IF FOUND: Confirm with specific details (e.g., "Great news! We deliver to Black Eagle in Cascade County. Since you're local, we can usually get your order to you same or next day.")
+      - IF NOT FOUND: Say "Please contact support for specific shipping details and routes. We primarily serve fixed routes in Great Falls and Billings, but often arrange shipping for other areas."
+      - BE PRECISE. Do not confuse different zip codes. 59414 is Black Eagle. 59412 is Belt. Do not guess.
 
       CRITICAL SAFETY RULES:
       1. ALWAYS verify that the information matches the product the user is asking about.

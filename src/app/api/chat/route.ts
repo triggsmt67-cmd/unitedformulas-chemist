@@ -12,10 +12,24 @@ const cache = new LRUCache<string, any>({
     ttl: 1000 * 60 * 5,
 });
 
-// Initialize GCS
-const storage = new Storage({
-    keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
-});
+// Initialize GCS with flexible credential handling for deployment
+// Priority: Base64-encoded credentials (production) > File path (local development)
+const getGCSStorage = () => {
+    // For production: Use Base64-encoded service account JSON
+    if (process.env.GCS_CREDENTIALS_BASE64) {
+        const credentials = JSON.parse(
+            Buffer.from(process.env.GCS_CREDENTIALS_BASE64, 'base64').toString('utf-8')
+        );
+        return new Storage({ credentials });
+    }
+    // For local development: Use file path
+    if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+        return new Storage({ keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS });
+    }
+    // Fallback: Use default application credentials (GCE, Cloud Run, etc.)
+    return new Storage();
+};
+const storage = getGCSStorage();
 const bucketName = process.env.GCS_BUCKET_NAME || 'united-formulas-files';
 
 // Initialize Gemini
@@ -25,7 +39,17 @@ const modelFlash = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
 export async function POST(req: NextRequest) {
     try {
-        const { message, history } = await req.json();
+        const body = await req.json();
+        const message = body?.message;
+        const history = body?.history || [];
+
+        // Input validation (fail fast)
+        if (!message || typeof message !== 'string') {
+            return NextResponse.json(
+                { error: 'Invalid request', code: 'VALIDATION_ERROR', details: 'Message is required' },
+                { status: 400 }
+            );
+        }
 
         // 1. Get Metadata (Cached)
         let metadata = cache.get('gcs_metadata');
@@ -41,7 +65,10 @@ export async function POST(req: NextRequest) {
                         if (!exists) return "";
                         const [content] = await file.download();
                         return content.toString();
-                    } catch { return ""; }
+                    } catch (err) {
+                        console.warn('Failed to load product_guide.txt:', err);
+                        return "";
+                    }
                 })(),
                 (async () => {
                     try {
@@ -50,7 +77,10 @@ export async function POST(req: NextRequest) {
                         if (!exists) return "";
                         const [content] = await file.download();
                         return content.toString();
-                    } catch { return ""; }
+                    } catch (err) {
+                        console.warn('Failed to load delivery_zipcodes.json:', err);
+                        return "";
+                    }
                 })()
             ]);
 
@@ -113,7 +143,12 @@ export async function POST(req: NextRequest) {
         } else if (selectedFile === 'GUIDE') {
             contextData = `STATUS: PRODUCT IDENTIFIED (CATALOG). FULL PRODUCT CATALOG & MAPPING GUIDE:\n${productGuide}`;
         } else if (selectedFile === 'DELIVERY') {
-            const parsedZips = zipcodes ? JSON.parse(zipcodes) : [];
+            let parsedZips: any[] = [];
+            try {
+                parsedZips = zipcodes ? JSON.parse(zipcodes) : [];
+            } catch (err) {
+                console.error('Failed to parse zipcodes JSON:', err);
+            }
             const zipList = parsedZips.map((z: any) => `${z.zip}: ${z.city} (${z.county})`).join('\n');
             contextData = `DELIVERY & SHIPPING CONTEXT:
             VALID DELIVERY LOCATIONS:
@@ -121,7 +156,9 @@ export async function POST(req: NextRequest) {
 
             GENERAL POLICY: We aim to ship all orders the next day. Local delivery is standard same/next day. Our main routes cover Great Falls and Billings regions.`;
         } else if (selectedFile === 'NONE') {
-            const lastUserMsg = history.findLast((msg: any) => msg.role === 'user')?.content || "";
+            // Safe findLast alternative for broader runtime compatibility
+            const reversedHistory = [...history].reverse();
+            const lastUserMsg = reversedHistory.find((msg: any) => msg.role === 'user')?.content || "";
             contextData = `STATUS: UNKNOWN PRODUCT. The user mentioned "${lastUserMsg}", but we do not have a technical record for it. Acknowledge this name specifically and offer general guidance.`;
         } else if (selectedFile !== 'NONE' && selectedFile.length > 0) {
             contextData = `STATUS: PRODUCT IDENTIFIED.`;
@@ -245,6 +282,10 @@ export async function POST(req: NextRequest) {
 
     } catch (error: any) {
         console.error('Error in Chat API:', error);
-        return NextResponse.json({ error: 'Failed' }, { status: 500 });
+        const errorMessage = error?.message || 'An unexpected error occurred';
+        return NextResponse.json(
+            { error: 'Chat request failed', code: 'INTERNAL_ERROR', details: errorMessage },
+            { status: 500 }
+        );
     }
 }

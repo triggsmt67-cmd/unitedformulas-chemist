@@ -87,18 +87,54 @@ export default function ChatWidget() {
     return (
         <>
             {/* Floating Toggle Button */}
-            <button
-                onClick={() => setIsOpen(!isOpen)}
-                className="fixed bottom-6 right-6 z-50 flex h-16 w-16 items-center justify-center rounded-full bg-slate-900 text-white shadow-2xl transition-all hover:scale-110 active:scale-95 group overflow-hidden border border-slate-700"
-                aria-label="Open Chemical Safety Intelligence"
-            >
-                <div className="absolute inset-0 bg-gradient-to-tr from-[#0052cc]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                {isOpen ? (
-                    <Icon icon="ph:x-bold" className="relative z-10 h-7 w-7 text-white" />
-                ) : (
-                    <Icon icon="ph:flask-bold" className="relative z-10 h-8 w-8 text-white" />
-                )}
-            </button>
+            <div className="fixed bottom-6 right-6 z-50 flex items-center">
+                <AnimatePresence>
+                    {!isOpen && (
+                        <motion.div
+                            initial={{ opacity: 0, x: 20, scale: 0.8 }}
+                            animate={{ opacity: 1, x: 0, scale: 1 }}
+                            exit={{ opacity: 0, x: 10, scale: 0.8 }}
+                            className="mr-3 cursor-pointer"
+                            onClick={() => setIsOpen(true)}
+                        >
+                            <motion.div
+                                animate={{
+                                    x: [0, -4, 0],
+                                }}
+                                transition={{
+                                    duration: 3,
+                                    repeat: Infinity,
+                                    ease: "easeInOut"
+                                }}
+                                className="relative group"
+                            >
+                                <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600/50 to-cyan-600/50 rounded-full blur opacity-40 group-hover:opacity-100 transition duration-1000" />
+                                <div className="relative px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-full flex items-center gap-3 shadow-2xl">
+                                    <span className="text-[10px] font-black tracking-[0.2em] text-white uppercase whitespace-nowrap">
+                                        Product & Safety Info
+                                    </span>
+                                    <div className="flex space-x-1">
+                                        <div className="w-1 h-1 rounded-full bg-blue-400 animate-ping" />
+                                    </div>
+                                </div>
+                            </motion.div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                <button
+                    onClick={() => setIsOpen(!isOpen)}
+                    className="relative flex h-16 w-16 items-center justify-center rounded-full bg-slate-900 text-white shadow-2xl transition-all hover:scale-110 active:scale-95 group overflow-hidden border border-slate-700"
+                    aria-label="Open Chemical Safety Intelligence"
+                >
+                    <div className="absolute inset-0 bg-gradient-to-tr from-[#0052cc]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    {isOpen ? (
+                        <Icon icon="ph:x-bold" className="relative z-10 h-7 w-7 text-white" />
+                    ) : (
+                        <Icon icon="ph:flask-bold" className="relative z-10 h-8 w-8 text-white" />
+                    )}
+                </button>
+            </div>
 
             {/* Chat Window */}
             <AnimatePresence>

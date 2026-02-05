@@ -107,7 +107,7 @@ export default function ChatWidget() {
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        className="fixed bottom-24 right-6 z-50 flex h-[700px] w-[450px] flex-col overflow-hidden rounded-[40px] border border-white/20 bg-white/95 backdrop-blur-xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)]"
+                        className="fixed bottom-24 right-6 z-50 flex h-[min(850px,82vh)] w-[min(600px,92vw)] flex-col overflow-hidden rounded-[40px] border border-white/20 bg-white/95 backdrop-blur-xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)]"
                     >
                         {/* Header: Dr. Aris Laboratory UI */}
                         <div className="relative h-64 w-full overflow-hidden">
@@ -171,7 +171,7 @@ export default function ChatWidget() {
                                     >
                                         <div
                                             className={`max-w-[85%] rounded-[24px] px-6 py-4 text-[15px] leading-relaxed relative prose prose-slate ${msg.role === 'user'
-                                                ? 'bg-slate-900 text-white rounded-br-none shadow-xl prose-invert'
+                                                ? 'bg-blue-600 text-white rounded-br-none shadow-[0_10px_30px_-10px_rgba(37,99,235,0.4)] prose-invert'
                                                 : 'bg-white text-slate-700 border border-slate-100 rounded-bl-none shadow-sm'
                                                 }`}
                                         >

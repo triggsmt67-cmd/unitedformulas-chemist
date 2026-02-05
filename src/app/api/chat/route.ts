@@ -72,19 +72,34 @@ export async function POST(req: NextRequest) {
       1. If the user asks about FIRST AID, SAFETY, HAZARDS, or EMERGENCY protocols, you MUST prioritize files in the "grounding/" folder.
       2. If the user asks about PRICING, SKU, or COMMERCE, look in the "sku_master/" folder.
       3. Use the PRODUCT GUIDE to map names like "Dynamo" or "Panhandler" to their technical files.
-      4. RETURN ONLY THE FILENAME. If no file matches, return "NONE".
+      4. If the user is asking for a RECOMMENDATION, COMPARISON, or a LIST of products (e.g., "What degreasers do you have?"), return "GUIDE".
+      5. RETURN ONLY THE FILENAME (e.g., grounding/grounding__xyz.txt) or "GUIDE" or "NONE".
+      6. If no specific file or category matches, return "NONE".
     `;
 
         const selectionResult = await modelFlash.generateContent(selectionPrompt);
-        const selectedFile = selectionResult.response.text().trim();
+        let selectedFile = selectionResult.response.text().trim();
+
+        // Clean up markdown or prefix if model hallucinations them
+        if (selectedFile.includes('```')) {
+            const match = selectedFile.match(/```(?:\w+)?\n([\s\S]*?)```/);
+            if (match) selectedFile = match[1].trim();
+        }
+        // Remove trailing or leading quotes/extra words
+        selectedFile = selectedFile.split('\n')[0].replace(/['"`]/g, '').trim();
+
         console.log(`Selected Context File: ${selectedFile}`);
 
-        let contextData = "No specific file found. Answer based on general knowledge.";
+        let contextData = "No specific technical record found for this product. Answer based on the Product Guide or general chemistry principles.";
 
         // 3. Step 2: Retrieve & Parse Content
-        if (selectedFile !== 'NONE' && selectedFile.length > 0) {
+        if (selectedFile === 'GUIDE') {
+            contextData = `FULL PRODUCT CATALOG & MAPPING GUIDE:\n${productGuide}`;
+        } else if (selectedFile !== 'NONE' && selectedFile.length > 0) {
             try {
-                if (files.some((f: any) => f.name === selectedFile)) {
+                // Exact match check
+                const fileRecord = files.find((f: any) => f.name === selectedFile);
+                if (fileRecord) {
                     const [fileBuffer] = await storage.bucket(bucketName).file(selectedFile).download();
 
                     if (selectedFile.toLowerCase().endsWith('.pdf')) {
@@ -94,9 +109,9 @@ export async function POST(req: NextRequest) {
                             pdfParser.on("pdfParser_dataReady", () => resolve(pdfParser.getRawTextContent()));
                             pdfParser.parseBuffer(fileBuffer);
                         });
-                        contextData = `CONTENT OF FILE "${selectedFile}":\n${pdfText.slice(0, 30000)}`;
+                        contextData = `TECHNICAL RECORD FOR: ${selectedFile}\nCONTENT:\n${pdfText.slice(0, 30000)}`;
                     } else {
-                        contextData = `CONTENT OF FILE "${selectedFile}":\n${fileBuffer.toString()}`;
+                        contextData = `TECHNICAL RECORD FOR: ${selectedFile}\nCONTENT:\n${fileBuffer.toString()}`;
                     }
                 }
             } catch (err) {
@@ -106,20 +121,27 @@ export async function POST(req: NextRequest) {
 
         // 4. Step 3: Generate Answer
         const systemInstruction = `
-      You are "Ask the Chemist", a high-priority chemical safety and technical consultant for United Formulas.
+      You are "Ask the Chemist", a lead chemical intelligence suite and formulation expert for United Formulas.
+      Your goal is to provide safety protocols, technical grounding, and professional product recommendations from the United Formulas catalog.
+
+      CRITICAL SAFETY RULES:
+      1. ALWAYS verify that the retrieved context matches the product the user is asking about.
+      2. If you are providing FIRST AID information, you MUST ensure it belongs to the EXACT product requested.
+      3. If the context provided does not match the product or is generic, DO NOT guess. Specify that the exact technical grounding for that product is not currently in the vault.
       
-      CRITICAL INSTRUCTION: FIRST AID & SAFETY
-      1. If a user asks about first aid, exposure, or safety, you must prioritize finding the "First Aid Measures" or "Hazards Identification" sections in the provided context.
-      2. Provide clear, step-by-step emergency instructions from the document.
-      3. ALWAYS include this disclaimer at the bottom of safety responses: "NOTE: In a medical emergency, call 911 or your local poison control center immediately."
+      PRODUCT RECOMMENDATIONS:
+      - Use the provided PRODUCT GUIDE to suggest products that fit the user's use case (e.g., degreasers, floor cleaners, detergents).
+      - If multiple products fit a family (like "Dynamo-X Commercial" vs "Dynamo-X Industrial"), explain the difference based on the names or any available metadata.
+      - Be helpful and proactive in suggesting the right United Formulas solution.
+
+      FIRST AID & SAFETY:
+      - Prioritize "First Aid Measures" or "Hazards Identification" sections.
+      - Provide clear, step-by-step emergency instructions.
+      - ALWAYS include this disclaimer: "NOTE: In a medical emergency, call 911 or your local poison control center immediately."
       
       MARKDOWN RULES:
       1. Format links as: [View SDS PDF](URL)
       2. Do not show raw URLs.
-      
-      ANSWERING DISCIPLINE:
-      - Use the PROVIDED CONTEXT to answer. 
-      - If the context does not contain the answer, specify that the information is not in the current technical record and recommend contacting professional support.
       
       RETRIEVED CONTEXT:
       ${contextData}

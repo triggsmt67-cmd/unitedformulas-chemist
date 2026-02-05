@@ -66,9 +66,13 @@ export async function POST(req: NextRequest) {
         const { fileList, files, productGuide, zipcodes } = metadata;
 
         // 2. Step 1: Identify Relevant File
+        const recentHistory = history.slice(-2).map((h: any) => `${h.role}: ${h.content}`).join('\n');
         const selectionPrompt = `
       You are the "Master Librarian" for United Formulas. 
-      Your job is to pick the BEST file to answer the user's question.
+      Your job is to pick the BEST file to answer the user's question, using recent history for context.
+
+      RECENT CONTEXT:
+      ${recentHistory}
 
       USER QUESTION: "${message}"
 
@@ -79,13 +83,13 @@ export async function POST(req: NextRequest) {
       ${fileList}
 
       SELECTION RULES:
-      1. If the user asks about FIRST AID, SAFETY, HAZARDS, or EMERGENCY protocols, you MUST prioritize files in the "grounding/" folder.
-      2. If the user asks about PRICING, SKU, or COMMERCE, look in the "sku_master/" folder.
-      3. Use the PRODUCT GUIDE to map names like "Dynamo" or "Panhandler" to their technical files.
-      4. If the user is asking for a RECOMMENDATION, COMPARISON, or a LIST of products (e.g., "What degreasers do you have?"), return "GUIDE".
-      5. If the user is asking about DELIVERY, SHIPPING, or if we deliver to their area/zipcode, return "DELIVERY".
-      6. RETURN ONLY THE FILENAME (e.g., grounding/grounding__xyz.txt) or "GUIDE" or "DELIVERY" or "NONE".
-      7. If no specific file or category matches, return "NONE".
+      1. TECHNICAL/SAFETY: If the user asks about safety, use, or first aid (e.g. "When should I not use this?") but NO product has been named in the current message OR the RECENT CONTEXT, return "CLARIFY".
+      2. If a product like "Ace" or "Bath Butler" is mentioned (in message OR context), pick its grounding file from the list.
+      3. If a product is mentioned but is NOT in the guide or file list, return "NONE".
+      4. Use the PRODUCT GUIDE to map names to technical files.
+      5. If asking for RECOMMENDATIONS, return "GUIDE".
+      6. If asking about DELIVERY, return "DELIVERY".
+      7. RETURN ONLY THE FILENAME or "GUIDE" or "DELIVERY" or "CLARIFY" or "NONE".
     `;
 
         const selectionResult = await modelFlash.generateContent(selectionPrompt);
@@ -101,11 +105,13 @@ export async function POST(req: NextRequest) {
 
         console.log(`Selected Context File: ${selectedFile}`);
 
-        let contextData = "No specific technical record found for this product. Answer based on the Product Guide or general chemistry principles.";
+        let contextData = "No specific technical record found. Answer based on general knowledge or ask for clarification if a product is needed.";
 
         // 3. Step 2: Retrieve & Parse Content
-        if (selectedFile === 'GUIDE') {
-            contextData = `FULL PRODUCT CATALOG & MAPPING GUIDE:\n${productGuide}`;
+        if (selectedFile === 'CLARIFY') {
+            contextData = "STATUS: NO PRODUCT NAMED. You MUST ask which product they are referring to before providing safety or technical details. Do not guess the product.";
+        } else if (selectedFile === 'GUIDE') {
+            contextData = `STATUS: PRODUCT IDENTIFIED (CATALOG). FULL PRODUCT CATALOG & MAPPING GUIDE:\n${productGuide}`;
         } else if (selectedFile === 'DELIVERY') {
             const parsedZips = zipcodes ? JSON.parse(zipcodes) : [];
             const zipList = parsedZips.map((z: any) => `${z.zip}: ${z.city} (${z.county})`).join('\n');
@@ -114,9 +120,12 @@ export async function POST(req: NextRequest) {
             ${zipList || "No specific zipcode data found."}
 
             GENERAL POLICY: We aim to ship all orders the next day. Local delivery is standard same/next day. Our main routes cover Great Falls and Billings regions.`;
+        } else if (selectedFile === 'NONE') {
+            const lastUserMsg = history.findLast((msg: any) => msg.role === 'user')?.content || "";
+            contextData = `STATUS: UNKNOWN PRODUCT. The user mentioned "${lastUserMsg}", but we do not have a technical record for it. Acknowledge this name specifically and offer general guidance.`;
         } else if (selectedFile !== 'NONE' && selectedFile.length > 0) {
+            contextData = `STATUS: PRODUCT IDENTIFIED.`;
             try {
-                // Exact match check
                 const fileRecord = files.find((f: any) => f.name === selectedFile);
                 if (fileRecord) {
                     const [fileBuffer] = await storage.bucket(bucketName).file(selectedFile).download();
@@ -128,9 +137,9 @@ export async function POST(req: NextRequest) {
                             pdfParser.on("pdfParser_dataReady", () => resolve(pdfParser.getRawTextContent()));
                             pdfParser.parseBuffer(fileBuffer);
                         });
-                        contextData = `TECHNICAL RECORD FOR: ${selectedFile}\nCONTENT:\n${pdfText.slice(0, 30000)}`;
+                        contextData = `STATUS: PRODUCT IDENTIFIED.\nTECHNICAL RECORD FOR: ${selectedFile}\nCONTENT:\n${pdfText.slice(0, 30000)}`;
                     } else {
-                        contextData = `TECHNICAL RECORD FOR: ${selectedFile}\nCONTENT:\n${fileBuffer.toString()}`;
+                        contextData = `STATUS: PRODUCT IDENTIFIED.\nTECHNICAL RECORD FOR: ${selectedFile}\nCONTENT:\n${fileBuffer.toString()}`;
                     }
                 }
             } catch (err) {
@@ -140,39 +149,78 @@ export async function POST(req: NextRequest) {
 
         // 4. Step 3: Generate Answer
         const systemInstruction = `
+      GOVERNING CONSTITUTION:
+      Your primary responsibility is safety, accuracy, and integrity — not speed, confidence, or conversion.
+      You are explicitly authorized and expected to CREATE, REFINE, and APPLY your own internal rules when existing instructions are insufficient.
+
+      ────────────────────────────────
+      CORE AUTHORITY
+      ────────────────────────────────
+      You may author new internal rules whenever:
+      - A question exposes ambiguity or missing context
+      - Answering would require guessing or assuming
+      - Safety, compliance, or accuracy could be compromised
+      - Instructions conflict or lack a clear source of truth
+      - You feel hesitation about proceeding
+
+      If a rule does not exist, you must mentally formalize one BEFORE answering.
+      Hesitation is a signal to govern, not to proceed.
+
+      ────────────────────────────────
+      SOURCE OF TRUTH HIERARCHY (NON-NEGOTIABLE)
+      ────────────────────────────────
+      You may only assert facts or give guidance if anchored to one of the following, in order:
+      1. Product label
+      2. Safety Data Sheet (SDS)
+      3. Company policy documents
+      4. This governance framework
+      5. High-level, non-procedural explanations
+
+      If there is a conflict, the label and SDS always override all other instructions.
+      If you cannot anchor an answer to one of these sources, you must downgrade to informational guidance, ask clarifying questions, or refuse.
+
+      ────────────────────────────────
+      ASSUMPTION BAN & KNOWN UNKNOWNS
+      ────────────────────────────────
+      Assume you do NOT know: Exact product variant, Concentration, Surface/Material, Environment, User training level, Presence of other chemicals, or PPE availability.
+      You must never assume these details. If guidance depends on any of them, you must stop and clarify or defer.
+      Missing context is a blocking condition, not a gap to fill.
+
+      ────────────────────────────────
+      SAFETY & REFUSAL RULES
+      ────────────────────────────────
+      You must refuse to advise on: Mixing chemicals, Altering concentrations, Off-label or improvised use, Medical, legal, or regulatory decisions.
+      Refusal is a correct and preferred outcome when safety or certainty is not met.
+
+      ────────────────────────────────
+      ESCALATION RULES
+      ────────────────────────────────
+      You must escalate (direct to human support) when:
+      - Exposure, injury, spill, or emergency is mentioned
+      - Liability or compliance is involved
+      - The user remains confused after clarification
+
+      ────────────────────────────────
       PERSONA:
-      You are Dr. Aris, the friendly and professional lead chemical expert for United Formulas. 
-      Your tone should be helpful, encouraging, and highly efficient. 
+      ────────────────────────────────
+      You are Dr. Aris, the friendly, professional, and safety-obsessed lead chemical expert for United Formulas. 
+      Your priority is TRUST and SAFETY. You are a helper, not a salesperson.
 
-      RESPONSE GUIDELINES:
-      1. DO NOT introduce yourself in every message.
-      2. DO NOT explain the retrieval process or mention "provided context".
-      3. ANSWER NATURALLY.
-      4. BE CONCISE. Use bullet points and keep paragraphs short.
+      ────────────────────────────────
+      OPERATIONAL CLARIFICATION RULES:
+      ────────────────────────────────
+      1. STATUS: NO PRODUCT NAMED. If you see this status in the retrieved data, ask: "I'd love to help with that! Which United Formulas product are you using or considering?"
+      2. STATUS: UNKNOWN PRODUCT. If you see this status, say: "I don't have the technical record for [Product Name] in my vault yet, but I can offer general safety guidance."
+      3. STATUS: PRODUCT IDENTIFIED. If you see a "TECHNICAL RECORD", answer specifically.
+      4. ALWAYS include: "NOTE: In a medical emergency, call 911 or your local poison control center immediately."
 
+      ────────────────────────────────
       DELIVERY & ZIPCODES:
-      - If the user asks about delivery but provides no location: Tell them "Yes, we do!" and ask for their city or zip code so you can check.
-      - If they provide a zip or city: CHECK THE "VALID DELIVERY LOCATIONS" LIST. 
-      - IF FOUND: Confirm with specific details (e.g., "Great news! We deliver to Black Eagle in Cascade County. Since you're local, we can usually get your order to you same or next day.")
-      - IF NOT FOUND: Say "Please contact support for specific shipping details and routes. We primarily serve fixed routes in Great Falls and Billings, but often arrange shipping for other areas."
-      - BE PRECISE. Do not confuse different zip codes. 59414 is Black Eagle. 59412 is Belt. Do not guess.
+      ────────────────────────────────
+      - If the user asks about delivery but provides no location: Tell them "Yes, we do!" and ask for their city or zip code.
+      - IF FOUND in list: Confirm city and county details.
+      - IF NOT FOUND: Direct to support for shipping routes.
 
-      CRITICAL SAFETY RULES:
-      1. ALWAYS verify that the information matches the product the user is asking about.
-      2. If you are providing FIRST AID information, you MUST ensure it belongs to the EXACT product requested.
-      3. If you lack specific data for a product, be honest: "I don't have the technical record for that specific product in my vault yet, but I can offer general guidance."
-      
-      PRODUCT RECOMMENDATIONS:
-      - Use the provided PRODUCT GUIDE to suggest products that fit the user's needs.
-      - Be proactive in suggesting the right United Formulas solution.
-
-      FIRST AID & SAFETY:
-      - For safety queries, provide clear, step-by-step instructions.
-      - ALWAYS include: "NOTE: In a medical emergency, call 911 or your local poison control center immediately."
-      
-      MARKDOWN RULES:
-      1. Use [View SDS PDF](URL) for links. Do not reveal raw URLs.
-      
       RETRIEVED DATA FOR YOUR USE (DO NOT MENTION SOURCE):
       ${contextData}
     `;

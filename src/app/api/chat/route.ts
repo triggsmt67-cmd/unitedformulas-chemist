@@ -32,11 +32,20 @@ export async function POST(req: NextRequest) {
         if (!metadata) {
             console.log("Fetching fresh GCS metadata...");
             // Run GCS calls in parallel to save time
-            const [filesRepo, guideContent] = await Promise.all([
+            const [filesRepo, guideContent, zipcodesContent] = await Promise.all([
                 storage.bucket(bucketName).getFiles(),
                 (async () => {
                     try {
                         const file = storage.bucket(bucketName).file('product_guide.txt');
+                        const [exists] = await file.exists();
+                        if (!exists) return "";
+                        const [content] = await file.download();
+                        return content.toString();
+                    } catch { return ""; }
+                })(),
+                (async () => {
+                    try {
+                        const file = storage.bucket(bucketName).file('delivery_zipcodes.json');
                         const [exists] = await file.exists();
                         if (!exists) return "";
                         const [content] = await file.download();
@@ -48,12 +57,13 @@ export async function POST(req: NextRequest) {
             metadata = {
                 fileList: filesRepo[0].map((f: any) => f.name).join('\n'),
                 files: filesRepo[0],
-                productGuide: guideContent
+                productGuide: guideContent,
+                zipcodes: zipcodesContent
             };
             cache.set('gcs_metadata', metadata);
         }
 
-        const { fileList, files, productGuide } = metadata;
+        const { fileList, files, productGuide, zipcodes } = metadata;
 
         // 2. Step 1: Identify Relevant File
         const selectionPrompt = `
@@ -73,8 +83,9 @@ export async function POST(req: NextRequest) {
       2. If the user asks about PRICING, SKU, or COMMERCE, look in the "sku_master/" folder.
       3. Use the PRODUCT GUIDE to map names like "Dynamo" or "Panhandler" to their technical files.
       4. If the user is asking for a RECOMMENDATION, COMPARISON, or a LIST of products (e.g., "What degreasers do you have?"), return "GUIDE".
-      5. RETURN ONLY THE FILENAME (e.g., grounding/grounding__xyz.txt) or "GUIDE" or "NONE".
-      6. If no specific file or category matches, return "NONE".
+      5. If the user is asking about DELIVERY, SHIPPING, or if we deliver to their area/zipcode, return "DELIVERY".
+      6. RETURN ONLY THE FILENAME (e.g., grounding/grounding__xyz.txt) or "GUIDE" or "DELIVERY" or "NONE".
+      7. If no specific file or category matches, return "NONE".
     `;
 
         const selectionResult = await modelFlash.generateContent(selectionPrompt);
@@ -95,6 +106,8 @@ export async function POST(req: NextRequest) {
         // 3. Step 2: Retrieve & Parse Content
         if (selectedFile === 'GUIDE') {
             contextData = `FULL PRODUCT CATALOG & MAPPING GUIDE:\n${productGuide}`;
+        } else if (selectedFile === 'DELIVERY') {
+            contextData = `DELIVERY & SHIPPING CONTEXT:\n${zipcodes ? `VALID DELIVERY ZIPCODES:\n${zipcodes}` : "No specific zipcode data found."}\n\nGENERAL POLICY: We aim to ship all orders the next day. Local delivery is standard same/next day.`;
         } else if (selectedFile !== 'NONE' && selectedFile.length > 0) {
             try {
                 // Exact match check
@@ -121,29 +134,38 @@ export async function POST(req: NextRequest) {
 
         // 4. Step 3: Generate Answer
         const systemInstruction = `
-      You are "Ask the Chemist", a lead chemical intelligence suite and formulation expert for United Formulas.
-      Your goal is to provide safety protocols, technical grounding, and professional product recommendations from the United Formulas catalog.
+      PERSONA:
+      You are Dr. Aris, the friendly and professional lead chemical expert for United Formulas. 
+      Your tone should be helpful, encouraging, and highly efficient. 
+
+      RESPONSE GUIDELINES:
+      1. DO NOT introduce yourself in every message.
+      2. DO NOT explain the retrieval process or mention "provided context".
+      3. ANSWER NATURALLY.
+      4. BE CONCISE. Use bullet points and keep paragraphs short.
+
+      DELIVERY & ZIPCODES:
+      - If the user provides a zipcode and it is FOUND in the list, confirm we deliver there!
+      - If the user provides a zipcode and it is NOT in the list, or if they ask about delivery and don't provide a zipcode, say: "Please contact support for specific shipping details and routes."
+      - Generally, we delivery to the Great Falls and Billings areas.
 
       CRITICAL SAFETY RULES:
-      1. ALWAYS verify that the retrieved context matches the product the user is asking about.
+      1. ALWAYS verify that the information matches the product the user is asking about.
       2. If you are providing FIRST AID information, you MUST ensure it belongs to the EXACT product requested.
-      3. If the context provided does not match the product or is generic, DO NOT guess. Specify that the exact technical grounding for that product is not currently in the vault.
+      3. If you lack specific data for a product, be honest: "I don't have the technical record for that specific product in my vault yet, but I can offer general guidance."
       
       PRODUCT RECOMMENDATIONS:
-      - Use the provided PRODUCT GUIDE to suggest products that fit the user's use case (e.g., degreasers, floor cleaners, detergents).
-      - If multiple products fit a family (like "Dynamo-X Commercial" vs "Dynamo-X Industrial"), explain the difference based on the names or any available metadata.
-      - Be helpful and proactive in suggesting the right United Formulas solution.
+      - Use the provided PRODUCT GUIDE to suggest products that fit the user's needs.
+      - Be proactive in suggesting the right United Formulas solution.
 
       FIRST AID & SAFETY:
-      - Prioritize "First Aid Measures" or "Hazards Identification" sections.
-      - Provide clear, step-by-step emergency instructions.
-      - ALWAYS include this disclaimer: "NOTE: In a medical emergency, call 911 or your local poison control center immediately."
+      - For safety queries, provide clear, step-by-step instructions.
+      - ALWAYS include: "NOTE: In a medical emergency, call 911 or your local poison control center immediately."
       
       MARKDOWN RULES:
-      1. Format links as: [View SDS PDF](URL)
-      2. Do not show raw URLs.
+      1. Use [View SDS PDF](URL) for links. Do not reveal raw URLs.
       
-      RETRIEVED CONTEXT:
+      RETRIEVED DATA FOR YOUR USE (DO NOT MENTION SOURCE):
       ${contextData}
     `;
 

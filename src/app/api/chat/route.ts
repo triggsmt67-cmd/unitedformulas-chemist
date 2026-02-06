@@ -90,51 +90,83 @@ export async function POST(req: NextRequest) {
                 productGuide: guideContent,
                 zipcodes: zipcodesContent
             };
+
+            // Local fallback for product guide if GCS is empty
+            if (!metadata.productGuide) {
+                try {
+                    const fs = require('fs');
+                    const path = require('path');
+                    const localPath = path.join(process.cwd(), 'product_guide_harvested.txt');
+                    if (fs.existsSync(localPath)) {
+                        metadata.productGuide = fs.readFileSync(localPath, 'utf-8');
+                        console.log("Using local product_guide_fallback (harvested).");
+                    }
+                } catch (e) {
+                    console.warn("Local guide fallback failed:", e);
+                }
+            }
+
+            console.log(`Metadata loaded. Guide length: ${metadata.productGuide?.length || 0}`);
             cache.set('gcs_metadata', metadata);
         }
 
         const { fileList, files, productGuide, zipcodes } = metadata;
 
         // 2. Step 1: Identify Relevant File
-        const recentHistory = history.slice(-2).map((h: any) => `${h.role}: ${h.content}`).join('\n');
+        const recentHistory = history.slice(-6).map((h: any) => `${h.role}: ${h.content}`).join('\n');
         const selectionPrompt = `
       You are the "Master Librarian" for United Formulas. 
-      Your job is to pick the BEST file to answer the user's question, using recent history for context.
+      Your job is to pick the BEST file to answer the user's question.
 
       RECENT CONTEXT:
       ${recentHistory}
 
       USER QUESTION: "${message}"
 
-      PRODUCT GUIDE (MAPPING):
+      PRODUCT GUIDE (MAPPING names to technical files):
       ${productGuide}
 
       AVAILABLE FILES:
       ${fileList}
 
       SELECTION RULES:
-      1. TECHNICAL/SAFETY: If the user asks about safety, use, or first aid (e.g. "When should I not use this?") but NO product has been named in the current message OR the RECENT CONTEXT, return "CLARIFY".
-      2. If a product like "Ace" or "Bath Butler" is mentioned (in message OR context), pick its grounding file from the list.
-      3. If a product is mentioned but is NOT in the guide or file list, return "NONE".
-      4. If the question is off-topic, personal, or unrelated to chemicals, products, or delivery (e.g., "What time is it?" or "Who won the game?"), return "GENERAL".
-      5. Use the PRODUCT GUIDE to map names to technical files.
-      6. If asking for RECOMMENDATIONS, return "GUIDE".
-      7. If asking about DELIVERY, return "DELIVERY".
-      8. RETURN ONLY THE FILENAME or "GUIDE" or "DELIVERY" or "CLARIFY" or "NONE" or "GENERAL".
+      1. SEARCH & TYPOS (TOP PRIORITY): If the user is searching for a category, use-case, or chemical (e.g. "car wash", "karr wassh", "asphlat", "flore soap", "dish soap", "degreaser", "pot and pan", "clner"), RETURN "GUIDE".
+      2. DIRECT MATCH: If a product name is mentioned (e.g. "Nugget Car Wash", "Ace"), pick its grounding file.
+      3. PRONOUNS: If the user says "it", "this", "that", "the product", resolve it to the specific product from RECENT CONTEXT and pick its file. 
+      4. CATEGORY MAPPINGS: Be EXTREMELY aggressive with typos. 
+         - Any mention of "wash", "wassh", "cleaner", "clner", "soap", "detergent", "degreaser", "acid", "caustic", "sanitizer" -> GUIDE
+      5. CLARIFY: Only return "CLARIFY" if they ask a technical/safety question ("Is it toxic?") but no product name has been mentioned yet and context is empty.
+      6. RETURN ONLY THE FILENAME or "GUIDE" or "DELIVERY" or "CLARIFY" or "NONE" or "GENERAL".
     `;
 
-        const selectionResult = await modelFlash.generateContent(selectionPrompt);
-        let selectedFile = selectionResult.response.text().trim();
+        // Safety Catch-all for Category Searches (Fuzzy Support)
+        const qLower = message.toLowerCase();
+        const categoryKeywords = ['wash', 'cleaner', 'clner', 'wassh', 'soap', 'detergent', 'degreas', 'acid', 'caustic', 'sanitiz', 'mop', 'wax', 'polish', 'dish'];
+        const isLikelySearch = categoryKeywords.some(k => qLower.includes(k));
 
-        // Clean up markdown or prefix if model hallucinations them
-        if (selectedFile.includes('```')) {
-            const match = selectedFile.match(/```(?:\w+)?\n([\s\S]*?)```/);
-            if (match) selectedFile = match[1].trim();
+        let selectedFile = "";
+        if (isLikelySearch) {
+            console.log("Category keyword detected, forcing GUIDE mode.");
+            selectedFile = "GUIDE";
+        } else {
+            const selectionResult = await modelFlash.generateContent(selectionPrompt);
+            selectedFile = selectionResult.response.text().trim();
         }
-        // Remove trailing or leading quotes/extra words
-        selectedFile = selectedFile.split('\n')[0].replace(/['"`]/g, '').trim();
 
-        console.log(`Selected Context File: ${selectedFile}`);
+        // Robust cleanup: find the FIRST occurrence of a valid keyword
+        const keywords = ['GUIDE', 'DELIVERY', 'CLARIFY', 'NONE', 'GENERAL'];
+        const upperSelected = selectedFile.toUpperCase();
+        for (const kw of keywords) {
+            if (upperSelected.includes(kw)) {
+                selectedFile = kw;
+                break;
+            }
+        }
+
+        // Final fallback cleanup for filenames (remove markdown/quotes)
+        selectedFile = selectedFile.replace(/```(?:\w+)?/g, '').replace(/['"`]/g, '').split('\n')[0].trim();
+
+        console.log(`Final Selected Context: ${selectedFile}`);
 
         let contextData = "No specific technical record found. Answer based on general knowledge or ask for clarification if a product is needed.";
 
@@ -191,95 +223,57 @@ export async function POST(req: NextRequest) {
         const systemInstruction = `
       GOVERNING CONSTITUTION:
       Your primary responsibility is safety, accuracy, and integrity — not speed, confidence, or conversion.
-      You are explicitly authorized and expected to CREATE, REFINE, and APPLY your own internal rules when existing instructions are insufficient.
+      You are Dr. Aris, the friendly, professional, and safety-obsessed lead chemical expert for United Formulas.
 
       ────────────────────────────────
-      CORE AUTHORITY
+      SOURCE OF TRUTH HIERARCHY
       ────────────────────────────────
-      You may author new internal rules whenever:
-      - A question exposes ambiguity or missing context
-      - Answering would require guessing or assuming
-      - Safety, compliance, or accuracy could be compromised
-      - Instructions conflict or lack a clear source of truth
-      - You feel hesitation about proceeding
-
-      If a rule does not exist, you must mentally formalize one BEFORE answering.
-      Hesitation is a signal to govern, not to proceed.
-
-      ────────────────────────────────
-      SOURCE OF TRUTH HIERARCHY (NON-NEGOTIABLE)
-      ────────────────────────────────
-      You may only assert facts or give guidance if anchored to one of the following, in order:
-      1. Product label
-      2. Safety Data Sheet (SDS)
-      3. Company policy documents
-      4. This governance framework
-      5. High-level, non-procedural explanations
-
-      If there is a conflict, the label and SDS always override all other instructions.
-      If you cannot anchor an answer to one of these sources, you must downgrade to informational guidance, ask clarifying questions, or refuse.
-
-      ────────────────────────────────
-      ASSUMPTION BAN & KNOWN UNKNOWNS
-      ────────────────────────────────
-      Assume you do NOT know: Exact product variant, Concentration, Surface/Material, Environment, User training level, Presence of other chemicals, or PPE availability.
-      You must never assume these details. If guidance depends on any of them, you must stop and clarify or defer.
-      Missing context is a blocking condition, not a gap to fill.
-
-      ────────────────────────────────
-      SAFETY & REFUSAL RULES
-      ────────────────────────────────
-      You must refuse to advise on: Mixing chemicals, Altering concentrations, Off-label or improvised use, Medical, legal, or regulatory decisions.
-      Refusal is a correct and preferred outcome when safety or certainty is not met.
-
-      ────────────────────────────────
-      ESCALATION RULES
-      ────────────────────────────────
-      You must escalate (direct to human support) when:
-      - Exposure, injury, spill, or emergency is mentioned
-      - Liability or compliance is involved
-      - The user remains confused after clarification
-
-      ────────────────────────────────
-      PERSONA:
-      ────────────────────────────────
-      You are Dr. Aris, the friendly, professional, and safety-obsessed lead chemical expert for United Formulas. 
-      Your priority is TRUST and SAFETY. You are a helper, not a salesperson.
+      1. Product technical records (SDS/Labels)
+      2. Company policy
+      3. This governance framework
 
       ────────────────────────────────
       OPERATIONAL CLARIFICATION RULES:
       ────────────────────────────────
-      1. STATUS: NO PRODUCT NAMED. If you see this status in the retrieved data, ask: "I'd love to help with that! Which United Formulas product are you using or considering?"
-      2. STATUS: UNKNOWN PRODUCT. If you see this status, say: "I don't have the technical record for [Product Name] in my vault yet, but I can offer general safety guidance."
-      3. STATUS: OUT OF SCOPE. If you see this status, be very friendly but clear: "I'm sorry, I don't have access to that information in my laboratory vault! I'm specifically trained to help with chemical safety and product info. Is there something brand-related I can help you with?"
-      4. STATUS: PRODUCT IDENTIFIED. If you see a "TECHNICAL RECORD", answer specifically.
-      5. ALWAYS include: "NOTE: In a medical emergency, call 911 or your local poison control center immediately."
+      1. FIRST AID & MEDICAL DISCLAIMER (STRICT): If (and ONLY IF) the user explicitly asks about first aid, exposure, or medical treatment, you MUST start your response with this EXACT sentence: "I am not a medical provider and cannot give medical advice, but here are the first aid instructions directly from our Safety Data Sheet (SDS) for this chemical:"
+      2. PROHIBITION: Do NOT include first aid instructions, medical disclaimers, or any "NOTE: In a medical emergency..." text unless specifically requested for safety guidance. Do not repeat the 911 emergency note in general conversation.
+      3. GENERAL PRODUCT INFO: If asked "Tell me about [Product]", provide a concise, one-sentence high-level overview.
+      4. DIRECTNESS: Provide technical answers immediately. Do NOT ask "Are you referring to..." if they named the product.
+      5. STATUS: NO PRODUCT NAMED: Ask "Which United Formulas product are you using or considering?"
+      6. STATUS: PRODUCT IDENTIFIED (TECHNICAL): Use the retrieved technical data to provide professional, precise guidance.
 
       ────────────────────────────────
       DELIVERY & ZIPCODES:
       ────────────────────────────────
-      - If the user asks about delivery but provides no location: Tell them "Yes, we do!" and ask for their city or zip code.
-      - IF FOUND in list: Confirm city and county details.
-      - IF NOT FOUND: Direct to support for shipping routes.
+      - If delivery but no location: Ask for city or zip.
+      - IF FOUND in list: Confirm city and county.
+      - IF NOT FOUND: Direct to support.
 
       RETRIEVED DATA FOR YOUR USE (DO NOT MENTION SOURCE):
       ${contextData}
     `;
 
-        let mappedHistory = history.map((msg: any) => ({
+        // Initialize model with system instruction
+        const chatModel = genAI.getGenerativeModel({
+            model: 'gemini-2.0-flash',
+            systemInstruction: systemInstruction
+        });
+
+        const mappedHistory = history.map((msg: any) => ({
             role: msg.role === 'user' ? 'user' : 'model',
             parts: [{ text: msg.content }],
         }));
+
         // Clean up history for API compatibility
         while (mappedHistory.length > 0 && mappedHistory[0].role === 'model') {
             mappedHistory.shift();
         }
 
-        const chat = modelFlash.startChat({
+        const chat = chatModel.startChat({
             history: mappedHistory,
         });
 
-        const result = await chat.sendMessage(`${systemInstruction}\n\nUSER QUESTION: ${message}`);
+        const result = await chat.sendMessage(message);
         const responseText = result.response.text();
 
         return NextResponse.json({ response: responseText });

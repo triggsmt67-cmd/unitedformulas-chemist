@@ -14,6 +14,63 @@ const cache = new LRUCache<string, any>({
     ttl: 1000 * 60 * 5,
 });
 
+const MAX_MESSAGE_LENGTH = 1000;
+const MAX_HISTORY_ITEMS = 12;
+const MAX_HISTORY_CONTENT_LENGTH = 6000;
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX_REQUESTS = 30;
+
+type RateLimitEntry = { count: number; expiresAt: number };
+const requestRateLimit = new LRUCache<string, RateLimitEntry>({
+    max: 500,
+    ttl: RATE_LIMIT_WINDOW_MS,
+});
+
+const getClientIp = (req: NextRequest) => {
+    const forwardedFor = req.headers.get('x-forwarded-for');
+    return forwardedFor?.split(',')[0].trim() || 'unknown';
+};
+
+const isRateLimited = (clientIp: string) => {
+    const now = Date.now();
+    const entry = requestRateLimit.get(clientIp);
+
+    if (!entry || entry.expiresAt <= now) {
+        requestRateLimit.set(clientIp, { count: 1, expiresAt: now + RATE_LIMIT_WINDOW_MS });
+        return false;
+    }
+
+    if (entry.count >= RATE_LIMIT_MAX_REQUESTS) {
+        return true;
+    }
+
+    requestRateLimit.set(clientIp, { ...entry, count: entry.count + 1 });
+    return false;
+};
+
+const sanitizeHistory = (history: unknown) => {
+    if (!Array.isArray(history)) return [];
+
+    const trimmedHistory = history
+        .filter((msg) => typeof msg === 'object' && msg !== null)
+        .map((msg: any) => ({
+            role: msg.role === 'user' ? 'user' : 'model', // Updated to match Gemini 'model' role
+            content: typeof msg.content === 'string' ? msg.content.slice(0, MAX_MESSAGE_LENGTH) : '',
+        }))
+        .filter((msg) => msg.content.length > 0)
+        .slice(-MAX_HISTORY_ITEMS);
+
+    let totalLength = 0;
+    return trimmedHistory.filter((msg) => {
+        if (totalLength + msg.content.length > MAX_HISTORY_CONTENT_LENGTH) {
+            return false;
+        }
+        totalLength += msg.content.length;
+        return true;
+    });
+};
+
+
 // Initialize GCS with flexible credential handling for deployment
 // Priority: Base64-encoded credentials (production) > File path (local development)
 const getGCSStorage = () => {
@@ -41,17 +98,44 @@ const modelFlash = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
 export async function POST(req: NextRequest) {
     try {
+        if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+            return NextResponse.json(
+                { error: 'Service temporarily unavailable', code: 'CONFIGURATION_ERROR' },
+                { status: 503 }
+            );
+        }
+
+        const clientIp = getClientIp(req);
+        if (isRateLimited(clientIp)) {
+            return NextResponse.json(
+                { error: 'Too many requests', code: 'RATE_LIMITED' },
+                { status: 429 }
+            );
+        }
+
         const body = await req.json();
-        const message = body?.message;
-        const history = body?.history || [];
+        const message = typeof body?.message === 'string' ? body.message.trim() : '';
+        const history = sanitizeHistory(body?.history);
 
         // Input validation (fail fast)
-        if (!message || typeof message !== 'string') {
+        if (!message) {
             return NextResponse.json(
                 { error: 'Invalid request', code: 'VALIDATION_ERROR', details: 'Message is required' },
                 { status: 400 }
             );
         }
+
+        if (message.length > MAX_MESSAGE_LENGTH) {
+            return NextResponse.json(
+                {
+                    error: 'Invalid request',
+                    code: 'VALIDATION_ERROR',
+                    details: `Message must be ${MAX_MESSAGE_LENGTH} characters or fewer`,
+                },
+                { status: 400 }
+            );
+        }
+
 
         // 1. Get Metadata (Cached)
         let metadata = cache.get('gcs_metadata');
@@ -335,10 +419,10 @@ export async function POST(req: NextRequest) {
 
     } catch (error: any) {
         console.error('Error in Chat API:', error);
-        const errorMessage = error?.message || 'An unexpected error occurred';
         return NextResponse.json(
-            { error: 'Chat request failed', code: 'INTERNAL_ERROR', details: errorMessage },
+            { error: 'Chat request failed', code: 'INTERNAL_ERROR', details: 'Unexpected server error' },
             { status: 500 }
         );
     }
+
 }

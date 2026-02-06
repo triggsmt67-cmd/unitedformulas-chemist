@@ -54,7 +54,10 @@ export default function ChatWidget() {
             const data = await response.json();
 
             if (data.error) {
-                throw new Error(data.error);
+                // Pass the code/details if strictly needed, or just throw the message
+                const err: any = new Error(data.error);
+                err.code = data.code;
+                throw err;
             }
 
             setMessages(prev => [...prev, {
@@ -62,11 +65,21 @@ export default function ChatWidget() {
                 content: data.response,
                 timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             }]);
-        } catch (error) {
+        } catch (error: any) {
             console.error('Chat error:', error);
+
+            let errorMessage = "Oops! Something went wrong on my end. Let's try that again.";
+            if (error.code === 'RATE_LIMITED') {
+                errorMessage = "You're sending messages too quickly. Please wait a moment before trying again.";
+            } else if (error.code === 'VALIDATION_ERROR') {
+                errorMessage = "Your message is too long or invalid. Please try a shorter question.";
+            } else if (error.code === 'CONFIGURATION_ERROR') {
+                errorMessage = "I'm currently undergoing maintenance. Please check back shortly.";
+            }
+
             setMessages(prev => [...prev, {
                 role: 'assistant',
-                content: "Oops! Something went wrong on my end. Let's try that again.",
+                content: errorMessage,
                 timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             }]);
         } finally {

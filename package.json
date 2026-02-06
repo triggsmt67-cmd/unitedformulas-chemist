@@ -16,7 +16,7 @@
     "dotenv": "^17.2.3",
     "framer-motion": "^12.29.2",
     "lru-cache": "^11.2.5",
-    "next": "15.1.6",
+    "next": "15.1.11",
     "pdf2json": "^4.0.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

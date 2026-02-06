@@ -4,6 +4,8 @@ import { Storage } from '@google-cloud/storage';
 import { LRUCache } from 'lru-cache';
 
 const PDFParser = require("pdf2json");
+const fs = require('fs');
+const path = require('path');
 
 // Initialize Cache (5 minute TTL for GCS metadata)
 // This prevents redundant GCS calls for every chat message
@@ -197,6 +199,43 @@ export async function POST(req: NextRequest) {
             contextData = `STATUS: OUT OF SCOPE. The user's question is unrelated to chemistry, products, or delivery. Politely acknowledge that as a chemical safety assistant, you don't have access to that information, but offer to help with anything related to United Formulas.`;
         } else if (selectedFile !== 'NONE' && selectedFile !== 'GENERAL' && selectedFile.length > 0) {
             contextData = `STATUS: PRODUCT IDENTIFIED.`;
+
+            // Load Premium Metadata (Marketing/Canonical Descriptions)
+            let metadata: any = {};
+            try {
+                const metadataPath = path.join(process.cwd(), 'src/data/product_metadata.json');
+                if (fs.existsSync(metadataPath)) {
+                    metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf8'));
+                }
+            } catch (err) {
+                console.error("Error loading product metadata:", err);
+            }
+
+            // Find match in metadata (including variants)
+            let premiumMatch: any = null;
+            // Improved Slug Logic:
+            // 1. Clean up file extensions and prefixes
+            // 2. Normalize spaces to hyphens for matching
+            // 3. Handle cases where the filename is "Delta Green" (spaces) vs "delta-green" (hyphens)
+            const cleanName = selectedFile.split('/').pop()?.replace(/grounding__|sku_master__|.txt|.pdf/g, '') || "";
+            const fileKey = cleanName.toLowerCase().split('__')[0].trim().replace(/\s+/g, '-');
+
+            console.log(`Searching metadata for slug: ${fileKey} (from file: ${selectedFile})`);
+
+            for (const [key, details] of Object.entries(metadata) as [string, any]) {
+                // Direct match OR Variant match OR Partial match for base products
+                // matches "delta-green-concentrate" against "delta-green"
+                if (key === fileKey ||
+                    (details.variants && details.variants.some((v: string) => v === fileKey || fileKey.startsWith(v))) ||
+                    (fileKey.startsWith(key))
+                ) {
+                    premiumMatch = details;
+                    console.log(`Match found: ${key}`);
+                    break;
+                }
+            }
+
+            let technicalRecord = "";
             try {
                 const fileRecord = files.find((f: any) => f.name === selectedFile);
                 if (fileRecord) {
@@ -209,14 +248,29 @@ export async function POST(req: NextRequest) {
                             pdfParser.on("pdfParser_dataReady", () => resolve(pdfParser.getRawTextContent()));
                             pdfParser.parseBuffer(fileBuffer);
                         });
-                        contextData = `STATUS: PRODUCT IDENTIFIED.\nTECHNICAL RECORD FOR: ${selectedFile}\nCONTENT:\n${pdfText.slice(0, 30000)}`;
+                        technicalRecord = pdfText.slice(0, 30000);
                     } else {
-                        contextData = `STATUS: PRODUCT IDENTIFIED.\nTECHNICAL RECORD FOR: ${selectedFile}\nCONTENT:\n${fileBuffer.toString()}`;
+                        technicalRecord = fileBuffer.toString();
                     }
                 }
             } catch (err) {
                 console.error("Error reading file:", err);
+                technicalRecord = "Technical record could not be loaded.";
             }
+
+            // Extract variants/sizes for context
+            const variantList = premiumMatch?.variants ? premiumMatch.variants.join(', ') : "No specific size info in metadata.";
+
+            contextData = `STATUS: PRODUCT IDENTIFIED.
+            
+            PREMIUM BRANDED DATA (MANDATORY FOR OVERVIEW):
+            - Product Name: ${premiumMatch?.displayName || selectedFile}
+            - Category: ${premiumMatch?.category || "Unknown"}
+            - Official Description: ${premiumMatch?.canonicalDescription || "No premium description available yet. Summarize technical record instead."}
+            - VARIANTS / SIZES: ${variantList} (If user asks about sizes, LIST THESE EXACTLY)
+            
+            TECHNICAL RECORD (SDS/TECHNICAL DATA):
+            ${technicalRecord}`;
         }
 
         // 4. Step 3: Generate Answer
@@ -228,9 +282,10 @@ export async function POST(req: NextRequest) {
       ────────────────────────────────
       SOURCE OF TRUTH HIERARCHY
       ────────────────────────────────
-      1. Product technical records (SDS/Labels)
-      2. Company policy
-      3. This governance framework
+      1. PREMIUM BRANDED DATA (Use Official Description verbatim for "What is this?" questions)
+      2. Product technical records (SDS/Labels)
+      3. Company policy
+      4. This governance framework
 
       ────────────────────────────────
       OPERATIONAL CLARIFICATION RULES:

@@ -1,0 +1,311 @@
+{
+    "all-temp-detergent": {
+        "displayName": "All Temp Detergent",
+        "canonicalDescription": "All Temp Detergent is a concentrated, phosphate-free liquid designed for automatic dishwashing. Effective at all temperature ranges, it’s formulated to suspend soils and prevent stubborn spots and stains, delivering premium performance with low usage.",
+        "category": "Commercial Liquid Automatic Dishwashing Detergent",
+        "variants": [
+            "all-temp-detergent-4x1-gallon",
+            "all-temp-detergent-5-gallon"
+        ]
+    },
+    "almond-cream": {
+        "displayName": "Almond Cream",
+        "canonicalDescription": "Almond Cream Hand Soap offers a rich lather and lotion-like texture to keep hands clean, soft, and refreshed. Ideal for both commercial dispensers and home use, it’s the perfect solution for everyday hand care.",
+        "category": "Bathroom",
+        "variants": [
+            "almond-cream-4x1-gallon"
+        ]
+    },
+    "apex": {
+        "displayName": "Apex",
+        "canonicalDescription": "Powerful, concentrated liquid dishwashing compound designed for use in commercial dish machines. Free of chlorine and harsh caustics, it effectively cleans without damaging aluminum ware. Safe for all water conditions and temperatures, Apex delivers premium performance in every wash.",
+        "category": "Commercial Liquid Automatic Dishwashing Detergent",
+        "variants": [
+            "apex-5-gallon"
+        ]
+    },
+    "bath-butler": {
+        "displayName": "Bath Butler",
+        "canonicalDescription": "Mild yet powerful non-filming acid cleaner designed to quickly and safely remove lime, hard water deposits, and soap scum from shower walls, ceramic tile floors, fiberglass showers, water fixtures, and select metal surfaces. It leaves bathrooms sparkling clean and fresh-smelling without harsh mineral acids.",
+        "category": "Bathroom",
+        "variants": [
+            "bath-butler-12x1-quart",
+            "bath-butler-4x1-gallon",
+            "bath-butler-5-gallon"
+        ]
+    },
+    "bio-maxx": {
+        "displayName": "Bio-Maxx",
+        "canonicalDescription": "Bio-Maxx is a powerful microbial odor eliminator and drain maintainer. This fresh scent product contains billions of bacteria that digest fats, oils and grease (FOG) in drains, grease traps, pipes, cesspools and portable restrooms. Perfect for commercial kitchens, restrooms, garbage areas, and any place unwanted odors originate.",
+        "category": "Bathroom",
+        "variants": [
+            "bio-maxx-4x1-gallon",
+            "bio-maxx-5-gallon"
+        ]
+    },
+    "brite-oeb": {
+        "displayName": "Brite OEB",
+        "canonicalDescription": "Brite OEB is a powerful oxygen bleach enzyme powder designed to brighten and whiten fabrics while helping remove tough protein stains. Ideal for commercial and industrial laundry applications.",
+        "category": "Laundry Powder",
+        "variants": [
+            "brite-oeb-4x8-lbs"
+        ]
+    },
+    "brite-oeb-plus": {
+        "displayName": "Brite OEB Plus",
+        "canonicalDescription": "Brite OEB Plus is a powerful oxygen bleach enzyme powder designed to brighten and whiten fabrics while helping remove tough protein stains. Ideal for commercial and industrial laundry applications.",
+        "category": "Laundry Powder",
+        "variants": [
+            "brite-oeb-plus-4x8-lbs"
+        ]
+    },
+    "brite-oeb-super": {
+        "displayName": "Brite OEB Super",
+        "canonicalDescription": "Brite OEB Super is a powerful oxygen bleach enzyme powder designed to brighten and whiten fabrics while helping remove tough protein stains. Ideal for commercial and industrial laundry applications.",
+        "category": "Laundry Powder",
+        "variants": [
+            "brite-oeb-super-4x8-lbs"
+        ]
+    },
+    "c4-concentrate": {
+        "displayName": "C4 Concentrate",
+        "category": "Degreaser",
+        "variants": [
+            "c4-concentrate-4x1-gallon",
+            "c4-concentrate-5-gallon"
+        ]
+    },
+    "calcium-lime-rust-remover": {
+        "displayName": "Calcium Lime Rust Remover",
+        "category": "Bathroom",
+        "variants": [
+            "calcium-lime-rust-remover-4x1-gallon",
+            "calcium-lime-rust-remover-5-gallon"
+        ]
+    },
+    "carbon-remover": {
+        "displayName": "Carbon Remover",
+        "category": "Degreaser",
+        "variants": [
+            "carbon-remover-4x1-gallon",
+            "carbon-remover-5-gallon"
+        ]
+    },
+    "catalyst": {
+        "displayName": "Catalyst",
+        "canonicalDescription": "Catalyst is a powerful laundry detergent builder designed to improve wash performance by boosting alkalinity and breaking down soils. Ideal for commercial laundry systems to enhance detergent efficiency and overall results.",
+        "category": "Commercial Liquid Laundry Detergent",
+        "variants": [
+            "catalyst-4x1-gallon",
+            "catalyst-5-gallon"
+        ]
+    },
+    "citrus-solvent": {
+        "displayName": "Citrus Solvent",
+        "category": "Degreaser"
+    },
+    "clearwater": {
+        "displayName": "Clearwater",
+        "category": "Car Wash",
+        "variants": [
+            "clearwater-4x1-gallon",
+            "clearwater-5-gallon"
+        ]
+    },
+    "clearwater-free": {
+        "displayName": "Clearwater Free",
+        "category": "Car Wash",
+        "variants": [
+            "clearwater-free-4x1-gallon",
+            "clearwater-free-5-gallon"
+        ]
+    },
+    "cloud-9": {
+        "displayName": "Cloud 9",
+        "category": "Car Wash",
+        "variants": [
+            "cloud-9-4x1-gallon",
+            "cloud-9-5-gallon"
+        ]
+    },
+    "cloud-9-free": {
+        "displayName": "Cloud 9 Free",
+        "category": "Car Wash",
+        "variants": [
+            "cloud-9-free-4x1-gallon",
+            "cloud-9-free-5-gallon"
+        ]
+    },
+    "crystal": {
+        "displayName": "Crystal",
+        "canonicalDescription": "Crystal is a premium rinse aid formulated to improve drying and reduce spotting on glassware and dishes in commercial dish machines. Effective across a wide range of water conditions for consistent, spot-free results.",
+        "category": "Commercial Liquid Automatic Dishwashing Detergent",
+        "variants": [
+            "crystal-4x1-gallon",
+            "crystal-5-gallon"
+        ]
+    },
+    "dazzle-ld500": {
+        "displayName": "Dazzle LD500",
+        "canonicalDescription": "Dazzle LD500 is a premium, concentrated powder laundry detergent formulated with a powerful blend of enzymes and surfactants to lift soils and remove stains. Designed for commercial and industrial laundry, it delivers bright, fresh results with controlled suds and economical use.",
+        "category": "Laundry Powder",
+        "variants": [
+            "dazzle-ld500-6x10-lbs"
+        ]
+    },
+    "dazzle-plus": {
+        "displayName": "Dazzle Plus",
+        "canonicalDescription": "A premium laundry detergent, controlled-suds. It is economical with low use rates. New advanced formulas are blended with quality surfactants, water conditioners and emulsifiers. Dazzle Plus produces bright, fresh results.",
+        "category": "Laundry Powder",
+        "variants": [
+            "dazzle-plus-6x10-lbs"
+        ]
+    },
+    "delta-green-commercial": {
+        "displayName": "Delta Green Commercial",
+        "category": "Degreaser",
+        "variants": [
+            "delta-green-commercial-4x1-gallon",
+            "delta-green-commercial-5-gallon"
+        ]
+    },
+    "delta-green-concentrate": {
+        "displayName": "Delta Green Concentrate",
+        "canonicalDescription": "Delta Green Concentrate is an advanced, high-performance cleaning solution engineered to deliver exceptional cleaning power while remaining environmentally responsible. Formulated to cut through tough grease and grime, it’s ideal for industrial and commercial applications where effective degreasing matters.",
+        "category": "Degreaser",
+        "variants": [
+            "delta-green-concentrate-4x1-gallon",
+            "delta-green-concentrate-5-gallon"
+        ]
+    },
+    "delta-green-industrial": {
+        "displayName": "Delta Green Industrial",
+        "canonicalDescription": "Delta Green Industrial is a heavy-duty degreaser formulated for demanding industrial cleaning jobs. It’s built to break down stubborn grease and oils on hard surfaces, equipment, and shop environments while maintaining strong overall performance.",
+        "category": "Degreaser",
+        "variants": [
+            "delta-green-industrial-4x1-gallon",
+            "delta-green-industrial-5-gallon"
+        ]
+    },
+    "delta-green-professional": {
+        "displayName": "Delta Green Professional",
+        "canonicalDescription": "Delta Green Professional is a high-performance degreaser formulated for commercial and professional use. It provides effective grease cutting and soil removal for general industrial cleaning where strong results and reliability are required.",
+        "category": "Degreaser",
+        "variants": [
+            "delta-green-professional-4x1-gallon",
+            "delta-green-professional-5-gallon"
+        ]
+    },
+    "dynamo-x": {
+        "displayName": "Dynamo-X",
+        "canonicalDescription": "Dynamo-X is a powerful heavy-duty cleaner, strongly alkaline and built to cut through grease, oil, and stubborn soils. Ideal for a wide range of industrial cleaning tasks including floors, walls, and equipment.",
+        "category": "Degreaser",
+        "variants": [
+            "dynamo-x-4x1-gallon",
+            "dynamo-x-5-gallon"
+        ]
+    },
+    "encompass": {
+        "displayName": "Encompass",
+        "canonicalDescription": "Encompass is a concentrated, phosphate-free liquid laundry detergent with exceptional stain-fighting and soil-suspension performance. Designed for commercial and industrial laundry systems, it delivers powerful cleaning while remaining economical with low use rates.",
+        "category": "Commercial Liquid Laundry Detergent",
+        "variants": [
+            "encompass-4x1-gallon",
+            "encompass-5-gallon"
+        ]
+    },
+    "foam-master": {
+        "displayName": "Foam Master",
+        "canonicalDescription": "Foam Master is a premium foaming hand soap designed to provide a rich lather with a clean, refreshing fragrance. Ideal for restrooms and high-traffic areas, it’s economical, easy to use, and leaves hands feeling soft and clean.",
+        "category": "Bathroom",
+        "variants": [
+            "foam-master-4x1-gallon",
+            "foam-master-5-gallon"
+        ]
+    },
+    "glass-cleaner": {
+        "displayName": "Glass Cleaner",
+        "category": "Household Cleaner"
+    },
+    "maintenance-master": {
+        "displayName": "Maintenance Master",
+        "canonicalDescription": "Effortlessly maintain sparkling floors with Maintenance Master, the advanced neutral cleaner designed for daily use. It removes dirt and grime without leaving residue, making it ideal for schools, offices, and commercial environments.",
+        "category": "Floor Care",
+        "variants": [
+            "maintenance-master-4x1-gallon",
+            "maintenance-master-5-gallon"
+        ]
+    },
+    "nugget": {
+        "displayName": "Nugget",
+        "canonicalDescription": "Nugget is a concentrated car wash detergent designed for automatic feed systems. It provides impressive wetting action and strong cleaning performance while being gentle on hands and surfaces.",
+        "category": "Car Wash",
+        "variants": [
+            "nugget-4x1-gallon",
+            "nugget-5-gallon"
+        ]
+    },
+    "rejuve": {
+        "displayName": "Rejuve",
+        "canonicalDescription": "Rejuve is a neutral pH floor cleaner formulated to remove soils without dulling or damaging floor finishes. Designed for daily maintenance, it cleans effectively and leaves floors looking bright and refreshed.",
+        "category": "Floor Care",
+        "variants": [
+            "rejuve-4x1-gallon",
+            "rejuve-5-gallon"
+        ]
+    },
+    "rip": {
+        "displayName": "RIP",
+        "canonicalDescription": "RIP is a powerful acidic cleaner designed to quickly remove mineral deposits, lime scale, and soap scum on hard surfaces. Ideal for bathrooms and other high-mineral areas where buildup is common.",
+        "category": "Bathroom",
+        "variants": [
+            "rip-4x1-gallon",
+            "rip-5-gallon"
+        ]
+    },
+    "shot-maker": {
+        "displayName": "Shot Maker",
+        "canonicalDescription": "Shot Maker is a heavy-duty detergent oil emulsifier designed for tough stain removal on fabrics. Effective against organic soils, grease, oils, and petroleum-based stains, it’s ideal for commercial laundry programs.",
+        "category": "Commercial Liquid Laundry Detergent",
+        "variants": [
+            "shot-maker-4x1-gallon",
+            "shot-maker-5-gallon"
+        ]
+    },
+    "spotless": {
+        "displayName": "Spotless",
+        "canonicalDescription": "Spotless is a high-quality drying agent designed for mechanical dishwashing machines. This economical rinse aid causes water to sheet off surfaces, helping dishes and glassware dry quickly and spot-free.",
+        "category": "Commercial Liquid Automatic Dishwashing Detergent",
+        "variants": [
+            "spotless-4x1-gallon",
+            "spotless-5-gallon"
+        ]
+    },
+    "steam-it": {
+        "displayName": "Steam It",
+        "canonicalDescription": "Steam It is a powerful oven and grill cleaner designed to dissolve baked-on grease, carbon, and food soils. Ideal for commercial kitchens and heavy-duty cleaning applications.",
+        "category": "Degreaser",
+        "variants": [
+            "steam-it-4x1-gallon",
+            "steam-it-5-gallon"
+        ]
+    },
+    "tornado-plus": {
+        "displayName": "Tornado Plus",
+        "canonicalDescription": "Tornado Plus is a powerful concentrated degreaser designed for industrial and commercial cleaning. It cuts through grease, oils, and soils on floors, equipment, and hard surfaces, leaving a clean finish.",
+        "category": "Degreaser",
+        "variants": [
+            "tornado-plus-4x1-gallon",
+            "tornado-plus-5-gallon"
+        ]
+    },
+    "traf-x": {
+        "displayName": "Traf-X",
+        "canonicalDescription": "Traf-X is a heavy-duty cleaner designed to remove tracked-in soils, grease, and grime from high-traffic floors. Ideal for commercial maintenance programs needing strong performance.",
+        "category": "Floor Care",
+        "variants": [
+            "traf-x-4x1-gallon",
+            "traf-x-5-gallon"
+        ]
+    }
+}

@@ -156,10 +156,10 @@ export default function ChatWidget() {
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        className="fixed bottom-24 right-6 z-50 flex h-[min(850px,82vh)] w-[min(600px,92vw)] flex-col overflow-hidden rounded-[40px] border border-white/20 bg-white/95 backdrop-blur-xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)]"
+                        className="fixed bottom-24 right-6 z-50 flex h-[min(900px,88vh)] w-[min(650px,95vw)] flex-col overflow-hidden rounded-[40px] border border-white/20 bg-white/95 backdrop-blur-xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)]"
                     >
                         {/* Header: Dr. Aris Laboratory UI */}
-                        <div className="relative h-64 w-full overflow-hidden">
+                        <div className="relative h-44 w-full overflow-hidden">
                             {/* Background Image with Blur and Overlay */}
                             <img
                                 src="/dr_aris_bg.png"
@@ -169,7 +169,7 @@ export default function ChatWidget() {
                             <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/60 to-slate-900/40" />
 
                             {/* Header Content */}
-                            <div className="relative h-full w-full flex flex-col p-8 z-10">
+                            <div className="relative h-full w-full flex flex-col p-6 z-10">
                                 {/* Top Toolbar */}
                                 <div className="flex justify-between items-start mb-auto">
                                     <button
@@ -197,8 +197,8 @@ export default function ChatWidget() {
                                             1K RES
                                         </span>
                                     </div>
-                                    <h2 className="text-4xl font-bold text-white tracking-tight">Dr. Aris</h2>
-                                    <p className="text-[11px] font-medium tracking-[0.1em] text-white/60 uppercase">
+                                    <h2 className="text-3xl font-bold text-white tracking-tight">Dr. Aris</h2>
+                                    <p className="text-[10px] font-medium tracking-[0.1em] text-white/60 uppercase">
                                         Chemical Safety Intelligence
                                     </p>
                                 </div>
@@ -260,7 +260,7 @@ export default function ChatWidget() {
                         </div>
 
                         {/* Input Area */}
-                        <div className="p-8 pb-10 bg-white">
+                        <div className="p-6 pb-6 bg-white">
                             <form onSubmit={handleSubmit} className="relative group mb-4">
                                 <input
                                     type="text"
@@ -289,7 +289,7 @@ export default function ChatWidget() {
                                         Quantum SSL V3
                                     </span>
                                 </div>
-                                <p className="text-[10px] text-slate-400 font-medium text-center px-4 leading-tight">
+                                <p className="text-[9px] text-slate-400 font-medium text-center px-4 leading-tight">
                                     AI-generated for informational use. The product label and SDS are the final authorities on safety and usage. Always verify with our team before proceeding.
                                 </p>
                             </div>

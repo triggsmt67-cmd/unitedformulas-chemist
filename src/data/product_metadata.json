@@ -2,53 +2,63 @@
     "all-temp-detergent": {
         "displayName": "All Temp Detergent",
         "canonicalDescription": "All Temp Detergent is a concentrated, phosphate-free liquid designed for automatic dishwashing. Effective at all temperature ranges, it’s formulated to suspend soils and prevent stubborn spots and stains, delivering premium performance with low usage.",
-        "category": "Commercial Liquid Automatic Dishwashing Detergent",
+        "category": "Commercial Liquid Automatic Dishwashing Detergent, Dishwashing Liquid, Kitchen",
         "variants": [
             "all-temp-detergent-4x1-gallon",
-            "all-temp-detergent-5-gallon"
+            "all-temp-detergent-5-gallon",
+            "all-temp-detergent-4x1-gal",
+            "all-temp-detergent-5-gal"
         ]
     },
     "almond-cream": {
         "displayName": "Almond Cream",
         "canonicalDescription": "Almond Cream Hand Soap offers a rich lather and lotion-like texture to keep hands clean, soft, and refreshed. Ideal for both commercial dispensers and home use, it’s the perfect solution for everyday hand care.",
-        "category": "Bathroom",
+        "category": "Bathroom, Hand Soap, Household Cleaner",
         "variants": [
-            "almond-cream-4x1-gallon"
+            "almond-cream-4x1-gallon",
+            "almond-cream-4x1-gal"
         ]
     },
     "apex": {
         "displayName": "Apex",
         "canonicalDescription": "Powerful, concentrated liquid dishwashing compound designed for use in commercial dish machines. Free of chlorine and harsh caustics, it effectively cleans without damaging aluminum ware. Safe for all water conditions and temperatures, Apex delivers premium performance in every wash.",
-        "category": "Commercial Liquid Automatic Dishwashing Detergent",
+        "category": "Commercial Liquid Automatic Dishwashing Detergent, Dishwashing Liquid, Kitchen & Warewash",
         "variants": [
-            "apex-5-gallon"
+            "apex-5-gallon",
+            "apex-5-gal"
         ]
     },
     "bath-butler": {
         "displayName": "Bath Butler",
         "canonicalDescription": "Mild yet powerful non-filming acid cleaner designed to quickly and safely remove lime, hard water deposits, and soap scum from shower walls, ceramic tile floors, fiberglass showers, water fixtures, and select metal surfaces. It leaves bathrooms sparkling clean and fresh-smelling without harsh mineral acids.",
-        "category": "Bathroom",
+        "category": "Bathroom, Bathroom Cleaner, Brass Chrome Stainless Steel Cleaner, Fiberglass Cleaner, Lime Cleaner, Tile Cleaner",
         "variants": [
             "bath-butler-12x1-quart",
             "bath-butler-4x1-gallon",
-            "bath-butler-5-gallon"
+            "bath-butler-5-gallon",
+            "bath-butler-12x1-qt",
+            "bath-butler-4x1-gal"
         ]
     },
     "bio-maxx": {
         "displayName": "Bio-Maxx",
-        "canonicalDescription": "Bio-Maxx is a powerful microbial odor eliminator and drain maintainer. This fresh scent product contains billions of bacteria that digest fats, oils and grease (FOG) in drains, grease traps, pipes, cesspools and portable restrooms. Perfect for commercial kitchens, restrooms, garbage areas, and any place unwanted odors originate.",
-        "category": "Bathroom",
+        "canonicalDescription": "Bio-Maxx is a powerful microbial odor eliminator and stain remover, formulated with five strains of enzyme-producing bacteria. It naturally breaks down organic matter, eliminating odors and stains from urine, feces, vomit, grease, and more. Bio-Maxx keeps grease traps and drain lines clean and flowing smoothly while providing immediate odor relief with a pleasant fragrance.",
+        "category": "Disinfectants & Deodorizers, Grease Trap Product, Laundry, Odor Eliminator, Pet Product",
         "variants": [
             "bio-maxx-4x1-gallon",
-            "bio-maxx-5-gallon"
+            "bio-maxx-5-gallon",
+            "bio-maxx-12x1-qt",
+            "bio-maxx-4x1-gal",
+            "bio-maxx-5-gal"
         ]
     },
     "brite-oeb": {
         "displayName": "Brite OEB",
-        "canonicalDescription": "Brite OEB is a powerful oxygen bleach enzyme powder designed to brighten and whiten fabrics while helping remove tough protein stains. Ideal for commercial and industrial laundry applications.",
-        "category": "Laundry Powder",
+        "canonicalDescription": "Brite OEB is a powerful oxygen bleach enzyme presoak designed to tackle tough food and protein stains. It boosts laundering performance, brightens fabrics, and is safe for use on both colored and white fabrics.",
+        "category": "All Color Bleach Presoak, Enzyme Presoak, Laundry",
         "variants": [
-            "brite-oeb-4x8-lbs"
+            "brite-oeb-4x8-lbs",
+            "brite-oeb-25-lb"
         ]
     },
     "brite-oeb-plus": {
@@ -109,7 +119,9 @@
         "category": "Car Wash",
         "variants": [
             "clearwater-4x1-gallon",
-            "clearwater-5-gallon"
+            "clearwater-5-gallon",
+            "clearwater-pf",
+            "clearwater-pf-4x1-gal"
         ]
     },
     "clearwater-free": {
@@ -125,7 +137,9 @@
         "category": "Car Wash",
         "variants": [
             "cloud-9-4x1-gallon",
-            "cloud-9-5-gallon"
+            "cloud-9-5-gallon",
+            "cloud-9-ex-pf",
+            "cloud-9-ex-pf-4x1-gal"
         ]
     },
     "cloud-9-free": {
@@ -147,62 +161,92 @@
     },
     "dazzle-ld500": {
         "displayName": "Dazzle LD500",
-        "canonicalDescription": "Dazzle LD500 is a premium, concentrated powder laundry detergent formulated with a powerful blend of enzymes and surfactants to lift soils and remove stains. Designed for commercial and industrial laundry, it delivers bright, fresh results with controlled suds and economical use.",
-        "category": "Laundry Powder",
+        "canonicalDescription": "Dazzle LD500 is a premium, concentrated powdered laundry detergent. Biodegradable, septic safe, and effective in both household and commercial machines, it delivers exceptional cleaning with just ¼ cup per load.",
+        "category": "Concentrated Detergent with Bleach, Laundry",
         "variants": [
-            "dazzle-ld500-6x10-lbs"
+            "dazzle-ld500-6x10-lbs",
+            "dazzle-ld500-25-lb"
         ]
     },
     "dazzle-plus": {
         "displayName": "Dazzle Plus",
-        "canonicalDescription": "A premium laundry detergent, controlled-suds. It is economical with low use rates. New advanced formulas are blended with quality surfactants, water conditioners and emulsifiers. Dazzle Plus produces bright, fresh results.",
-        "category": "Laundry Powder",
+        "canonicalDescription": "Dazzle Plus is a premium controlled-suds laundry detergent enhanced with safe oxygen bleach. Its concentrated formula removes stains, protects colors, and is septic safe—all while saving you money.",
+        "category": "Concentrated Detergent with Bleach, Laundry",
         "variants": [
-            "dazzle-plus-6x10-lbs"
+            "dazzle-plus-6x10-lbs",
+            "dazzle-plus-25-lb"
         ]
     },
     "delta-green-commercial": {
         "displayName": "Delta Green Commercial",
-        "category": "Degreaser",
+        "canonicalDescription": "Delta Green Commercial \\n \\n \\n \\nDelta Green Commercial is an advanced cleaning solution crafted to combine unmatched cleaning power with environmental and user safety. This high-performance, water-based degreaser features 100% active, non-hazardous ingredients that effectively remove heavy grease, oil, soil, encrusted dirt, smoke residue, and light carbon deposits. \\n \\n \\n \\n Key Features: \\n \\n Eco-Friendly: Formulated to be 100% non-hazardous and environmentally safe, ensuring the well-being of users and the planet. \\n Exceptional Cleaning Power: Delivers superior performance for tackling tough cleaning tasks without harsh acids, caustics, or solvents. \\n Versatile Applications: Suitable for industrial, commercial, and maintenance settings requiring effective and reliable cleaning solutions. \\n Certified Safe: Meets OSHA and WHMIS hazard communication standards, containing no hazardous or carcinogenic ingredients. \\n \\nDelta Green Commercial exemplifies Delta Green's commitment to quality, safety, and environmental responsibility. Experience a cleaner, safer way to maximize productivity and client satisfaction without compromising the health of users or the planet.",
+        "category": "Commercial Cleaner & Degreaser, Commercial Multi Purpose Cleaner",
         "variants": [
             "delta-green-commercial-4x1-gallon",
-            "delta-green-commercial-5-gallon"
+            "delta-green-commercial-5-gallon",
+            "delta-green-commercial-12x1-qt",
+            "delta-green-commercial-4x1-gal",
+            "delta-green-commercial-5-gal"
         ]
     },
     "delta-green-concentrate": {
         "displayName": "Delta Green Concentrate",
-        "canonicalDescription": "Delta Green Concentrate is an advanced, high-performance cleaning solution engineered to deliver exceptional cleaning power while remaining environmentally responsible. Formulated to cut through tough grease and grime, it’s ideal for industrial and commercial applications where effective degreasing matters.",
-        "category": "Degreaser",
+        "canonicalDescription": "Delta Green Concentrate® \\n \\n \\n \\nDelta Green Concentrate® is an advanced, high-performance cleaning solution engineered to deliver exceptional cleaning power without compromising safety or environmental responsibility. This water-based degreaser is composed of 100% active, non-hazardous ingredients that excel at removing heavy grease, oil, encrusted dirt, smoke, light carbon, and other stubborn soils. \\n \\n \\n \\n Key Features: \\n \\n Eco-Friendly: 100% non-hazardous and environmentally safe, offering peace of mind for both users and the planet. \\n Powerful Cleaning Action: Effectively removes tough grime without the use of harsh acids, caustics, or solvents. \\n Certified Safe: Meets OSHA and WHMIS hazard communication standards and contains no hazardous or carcinogenic components. \\n Versatile Performance: Ideal for industrial, commercial, and maintenance applications, ensuring superior cleaning results across various environments. \\n \\nDelta Green Concentrate® embodies Delta Green's dedication to creating sustainable cleaning products that prioritize safety, performance, and client satisfaction. Revolutionize your cleaning practices with this superior, eco-conscious solution designed for even the most challenging tasks.",
+        "category": "Cleaner & Degreaser, Multi Purpose Cleaner",
         "variants": [
             "delta-green-concentrate-4x1-gallon",
-            "delta-green-concentrate-5-gallon"
+            "delta-green-concentrate-5-gallon",
+            "delta-green-concentrate-12x1-qt",
+            "delta-green-concentrate-4x1-gal",
+            "delta-green-concentrate-5-gal"
         ]
     },
     "delta-green-industrial": {
         "displayName": "Delta Green Industrial",
-        "canonicalDescription": "Delta Green Industrial is a heavy-duty degreaser formulated for demanding industrial cleaning jobs. It’s built to break down stubborn grease and oils on hard surfaces, equipment, and shop environments while maintaining strong overall performance.",
-        "category": "Degreaser",
+        "canonicalDescription": "A 100% non-hazardous, environmentally safe industrial degreaser designed to tackle tough cleaning jobs while protecting users and the environment.",
+        "category": "Industrial Cleaner & Degreaser, Industrial Multi Purpose Cleaner",
         "variants": [
             "delta-green-industrial-4x1-gallon",
-            "delta-green-industrial-5-gallon"
+            "delta-green-industrial-5-gallon",
+            "delta-green-industrial-12x1-qt",
+            "delta-green-industrial-4x1-gal",
+            "delta-green-industrial-5-gal"
         ]
     },
     "delta-green-professional": {
         "displayName": "Delta Green Professional",
-        "canonicalDescription": "Delta Green Professional is a high-performance degreaser formulated for commercial and professional use. It provides effective grease cutting and soil removal for general industrial cleaning where strong results and reliability are required.",
-        "category": "Degreaser",
+        "canonicalDescription": "A premium, 100% non-hazardous, environmentally safe degreaser designed for superior cleaning power without compromising user safety or sustainability.",
+        "category": "Professional Cleaner & Degreaser, Professional Multi Purpose Cleaner",
         "variants": [
             "delta-green-professional-4x1-gallon",
-            "delta-green-professional-5-gallon"
+            "delta-green-professional-5-gallon",
+            "delta-green-professional-12x1-gal",
+            "delta-green-professional-4x1-gal",
+            "delta-green-professional-5-gal"
         ]
     },
     "dynamo-x": {
         "displayName": "Dynamo-X",
-        "canonicalDescription": "Dynamo-X is a powerful heavy-duty cleaner, strongly alkaline and built to cut through grease, oil, and stubborn soils. Ideal for a wide range of industrial cleaning tasks including floors, walls, and equipment.",
-        "category": "Degreaser",
+        "canonicalDescription": "Dynamo-X is a powerful heavy-duty cleaner, stripper, and degreaser with high active ingredients and low alkalinity. Ideal for demanding cleaning tasks, including floor stripping, smoke damage cleaning, and degreasing kitchens or garages. Non-flammable and safe with fast, effective cleaning action.",
+        "category": "All Purpose > All Purpose Cleaner, Degreaser, Floor Care, Laundry, Multi Purpose Cleaner, Stripper",
         "variants": [
             "dynamo-x-4x1-gallon",
-            "dynamo-x-5-gallon"
+            "dynamo-x-5-gallon",
+            "dynamo-x-5-gal",
+            "dynamo-x-12x1-qt",
+            "dynamo-x-4x1-gal",
+            "dynamo-x-commercial",
+            "dynamo-x-commercial-12x1-qt",
+            "dynamo-x-commercial-4x1-gal",
+            "dynamo-x-commercial-5-gal",
+            "dynamo-x-professional",
+            "dynamo-x-professional-12x1-qt",
+            "dynamo-x-professional-4x1-gal",
+            "dynamo-x-professional-5-gal",
+            "dynamo-x-industrial",
+            "dynamo-x-industrial-12x1-qt",
+            "dynamo-x-industrial-4x1-gal",
+            "dynamo-x-industrial-5-gal"
         ]
     },
     "encompass": {
@@ -229,11 +273,14 @@
     },
     "maintenance-master": {
         "displayName": "Maintenance Master",
-        "canonicalDescription": "Effortlessly maintain sparkling floors with Maintenance Master, the advanced neutral cleaner designed for daily use. It removes dirt and grime without leaving residue, making it ideal for schools, offices, and commercial environments.",
-        "category": "Floor Care",
+        "canonicalDescription": "Effortlessly maintain sparkling floors with Maintenance Master, the advanced neutral cleaner designed for daily use. It cleans hard, non-porous surfaces without rinsing, leaving no streaks or dulling film.",
+        "category": "All Purpose, Daily Cleaner, Floor Care, Household Cleaner",
         "variants": [
             "maintenance-master-4x1-gallon",
-            "maintenance-master-5-gallon"
+            "maintenance-master-5-gallon",
+            "maintenance-master-4x1-gal",
+            "maintenance-master-5-gal",
+            "maintenance-master-12x1-qt"
         ]
     },
     "nugget": {
@@ -242,7 +289,12 @@
         "category": "Car Wash",
         "variants": [
             "nugget-4x1-gallon",
-            "nugget-5-gallon"
+            "nugget-5-gallon",
+            "nugget-xk-car-wash",
+            "nugget-xk-car-wash-4x1-gal",
+            "nugget-xk-car-wash-5-gal",
+            "nugget-car-wash",
+            "nugget-car-wash-20-lb"
         ]
     },
     "rejuve": {
@@ -307,5 +359,453 @@
             "traf-x-4x1-gallon",
             "traf-x-5-gallon"
         ]
+    },
+    "blitz-pf": {
+        "displayName": "Blitz (PF)",
+        "canonicalDescription": "Concentrated, phosphate-free liquid alkaline builder that effectively boosts wash pH to break up soils in fabrics. Formulated with high levels of soil suspenders and water conditioners, it offers powerful cleaning while being environmentally friendly. Its concentrated formula reduces usage and waste.",
+        "category": "Laundry, Laundry Break, Laundry Softener, Laundry Sour, Phosphate Free",
+        "variants": [
+            "blitz-pf-5-gal"
+        ]
+    },
+    "clearwater-pf": {
+        "displayName": "Clearwater (PF)",
+        "canonicalDescription": "Concentrated, phosphate-free liquid laundry detergent designed for residential machines. Biodegradable and septic-safe, it delivers excellent cleaning in all water temperatures while being gentle on fabrics. Highly concentrated for effective stain removal, a small amount goes a long way.",
+        "category": "Laundry, Laundry Detergent, Phosphate Free",
+        "variants": [
+            "clearwater-pf-4x1-gal"
+        ]
+    },
+    "emusolv": {
+        "displayName": "Emusolv",
+        "canonicalDescription": "Concentrated detergent oil emulsifier designed for heavy-duty stain removal on all fabrics. Effective against organic soils like makeup, oils, and inks, it’s versatile and safe, making it ideal for laundry services and industrial applications.",
+        "category": "Laundry, Laundry Detergent, Premium Detergent Emulsifier",
+        "variants": [
+            "emusolv-4x1-gal",
+            "emusolv-5gal",
+            "emusolv-12x1-qt"
+        ]
+    },
+    "ez-rinse": {
+        "displayName": "EZ Rinse",
+        "canonicalDescription": "High-quality drying agent designed for mechanical dishwashing machines. This economical rinse aid causes water to sheet off dishware, leaving them spotless and speeding up drying time. Suitable for both low and high-temperature applications, EZ Rinse is added automatically by rinse injectors for effortless use.",
+        "category": "Dishwasher, Kitchen, Kitchen & Warewash, Rinse Aid",
+        "variants": [
+            "ez-rinse-4x1-gal",
+            "ez-rinse-5-gal"
+        ]
+    },
+    "high-temp-detergent": {
+        "displayName": "High Temp Detergent",
+        "canonicalDescription": "Concentrated, chlorinated dishwashing liquid designed for high-temperature machines. With a high active content, it delivers premium performance at low use levels and dissolves completely, ensuring spotless results every time.",
+        "category": "Commercial Liquid Automatic Dishwashing Detergent, Dishwashing Liquid, Kitchen",
+        "variants": [
+            "high-temp-detergent-5-gal",
+            "high-temp-detergent-4x1-gal"
+        ]
+    },
+    "jewel-master-hd": {
+        "displayName": "Jewelmaster HD",
+        "canonicalDescription": "Jewel Master HD is a powerful, biodegradable cleaner degreaser made without butyl cellosolve, harsh alkali, or phosphates. Ideal for kitchens, machine shops, heavy equipment, carpets, and jewelry cleaning, it offers versatile, nonhazardous cleaning performance for a wide range of applications.",
+        "category": "Degreaser, Heavy Duty Cleaner, Heavy Duty Degreaser",
+        "variants": [
+            "jewel-master-hd-12x1-qt",
+            "jewel-master-hd-4x1-gal",
+            "jewel-master-hd-5-gal"
+        ]
+    },
+    "lightning": {
+        "displayName": "Lightning",
+        "canonicalDescription": "Triple-concentrated organic acid de-scaler and de-limer that effectively removes mineral scale deposits. Ideal for dishwashers, drinking fountains, and hard surfaces, its low-foaming formula delivers powerful results against hard water buildup.",
+        "category": "Bathroom, De-Limer, De-Scaler, Kitchen & Warewash, Organic Acid De-Limer, Organic Acid De-Scaler",
+        "variants": [
+            "lightning-4x1-gal",
+            "lightning-12x1-qt"
+        ]
+    },
+    "liquid-silver-soak": {
+        "displayName": "Liquid Silver Soak",
+        "canonicalDescription": "Liquid Silver Soak is a concentrated presoak designed to remove tarnish and restore the shine of silverware and flatware. Effective at reversing oxidation on true silver, it is mild on the skin and requires just 1 oz per gallon of water, making it economical and easy to use.",
+        "category": "Kitchen, Kitchen & Warewash, Premium Flatware Soak, Premium Silverware Soak",
+        "variants": [
+            "liquid-silver-soak-4x1-gal",
+            "liquid-silver-soak-5-gal"
+        ]
+    },
+    "low-temp-detergent": {
+        "displayName": "Low Temp Detergent",
+        "canonicalDescription": "Concentrated liquid dishwashing compound designed for low-temperature machines. With a high active content, it ensures premium performance in a variety of water conditions and completely dissolves in every wash, leaving no residue behind.",
+        "category": "Commercial Liquid Automatic Dishwashing Detergent, Dishwashing Liquid, Kitchen",
+        "variants": [
+            "low-temp-detergent-5-gal",
+            "low-temp-detergent-4x1-gal"
+        ]
+    },
+    "oxy-brite-pf": {
+        "displayName": "Oxy Brite (PF)",
+        "canonicalDescription": "Oxy Brite (PF) is a safe, organic oxygen bleach for all fabrics. It brightens whites without discoloration, removes tough stains, and works as a presoak. Highly concentrated and color-safe for effective stain removal.",
+        "category": "All Color Bleach Presoak, Laundry, Premium Oxygen Bleach",
+        "variants": [
+            "oxy-brite-pf-25-lb"
+        ]
+    },
+    "oxy-rejuve": {
+        "displayName": "Oxy Rejuve",
+        "canonicalDescription": "Concentrated liquid oxygen bleaching agent that effectively removes tough stains while being safe for colored fabrics. Ideal for use in high iron content areas, it’s a powerful, economical alternative to chlorine bleaches.",
+        "category": "Bleaches, Laundry",
+        "variants": [
+            "oxy-rejuve-5-gal"
+        ]
+    },
+    "pazzaz": {
+        "displayName": "Pazzaz",
+        "canonicalDescription": "Pazzaz is an economical, controlled-suds laundry detergent. Gentle on fabrics yet highly effective, it brightens, softens, and cleans in both hot and cold water. Ideal for household and commercial use.",
+        "category": "Laundry, Suds Laundry Detergent",
+        "variants": [
+            "pazzaz-25-lb"
+        ]
+    },
+    "r&r-degreaser": {
+        "displayName": "R&R Degreaser",
+        "canonicalDescription": "R&R Degreaser is a powerful cleaning solution with foaming and clinging properties, perfect for vertical surfaces. It effectively tackles tough jobs like degreasing engines, cleaning ovens and grills, and removing smoke and diesel buildup. Ideal for pressure wash and steam systems.",
+        "category": "All Purpose Degreaser, Cleaner, Degreaser, Multi-Purpose Degreaser",
+        "variants": []
+    },
+    "r&amp;r-degreaser-12x1-gal": {
+        "displayName": "R&R Degreaser - 12x1 Quart",
+        "canonicalDescription": "' \\n\\n",
+        "category": "",
+        "variants": []
+    },
+    "r&amp;r-degreaser-4x1-gal": {
+        "displayName": "R&R Degreaser - 4x1 Gallon",
+        "canonicalDescription": "' \\n\\n",
+        "category": "",
+        "variants": []
+    },
+    "r&amp;r-degreaser-5-gal": {
+        "displayName": "R&R Degreaser - 5 Gallon",
+        "canonicalDescription": "' \\n\\n",
+        "category": "",
+        "variants": []
+    },
+    "tornado": {
+        "displayName": "Tornado",
+        "canonicalDescription": "Part of United Formula's specially curated Liquid Laundry System, this highly concentrated formula lifts and suspends soils for easy removal while powerful brighteners ensure your wash sparkles with freshness. Designed to work with the Boost Non-Alkaline Builder, it can also be used as a standalone detergent.",
+        "category": "Laundry, Laundry De-Stainer, Laundry Detergent, Laundry Pre-Soak",
+        "variants": [
+            "tornado-5-gal"
+        ]
+    },
+    "vinegar-neutralizer": {
+        "displayName": "Vinegar Neutralizer",
+        "canonicalDescription": "Versatile concentrated vinegar neutralizes floor strippers, brightens laundry, and tackles tough stains. Economical and safe on most surfaces, this is your go-to solution for achieving a spotless clean!",
+        "category": "Floor Care, Floor Cleaner, Floor Stripper",
+        "variants": [
+            "vinegar-neutralizer-4x1-gal",
+            "vinegar-neutralizer-5-gal"
+        ]
+    },
+    "chlorbrite-nf": {
+        "displayName": "Chlorbrite NF",
+        "canonicalDescription": "Chlorbrite NF is a dry, concentrated chlorine bleach with 8.5% active chlorine content. It provides powerful, stable bleaching action without strong odors, safe for both commercial and household washers.",
+        "category": "Bleach Powder, Bleaches, Concentrated Dry Chlorine Bleach, Laundry",
+        "variants": [
+            "chlorbrite-nf-25-lb"
+        ]
+    },
+    "cloud-9-ex-pf": {
+        "displayName": "Cloud 9 EX (PF)",
+        "canonicalDescription": "Cloud 9 EX is a highly concentrated, phosphate-free fabric softener that leaves fabrics soft and cling-free. By reducing water retention during washing, it shortens drying times and lowers costs. Derived from natural ingredients, it provides superior softness and reduces static.",
+        "category": "Laundry, Laundry Break, Laundry Softener, Laundry Sour, Phosphate Free",
+        "variants": [
+            "cloud-9-ex-pf-4x1-gal"
+        ]
+    },
+    "fryer-squire": {
+        "displayName": "Fryer Squire",
+        "canonicalDescription": "Fryer Squire is a commercial-grade degreaser designed for deep fat fryers. Its heat-activated formula penetrates and emulsifies carbonized grease, improving fryer performance and the quality of fried foods. Not for use with aluminum surfaces.",
+        "category": "Deep Fat Fryer Cleaner, Kitchen, Kitchen & Warewash",
+        "variants": []
+    },
+    "genie": {
+        "displayName": "Genie",
+        "canonicalDescription": "A powerful liquid glass cleaner that leaves glass and windows sparkling clean with a quick, streak-free formula.",
+        "category": "Glass cleaner",
+        "variants": [
+            "genie-24x16-oz",
+            "genie-4x1-gal"
+        ]
+    },
+    "glacier-blue-suds": {
+        "displayName": "Glacier Blue Suds",
+        "canonicalDescription": "Looking for long-lasting suds? Glacier Blue Suds is a high-sudsing dish detergent made with natural ingredients. With a balanced pH, it’s gentle yet powerful, leaving dishes clean and fresh with every wash.",
+        "category": "Extra Sudsy, Kitchen, Pot & Pan Dishwashing Liquid",
+        "variants": [
+            "glacier-blue-suds-4x1-gal",
+            "glacier-blue-suds-5-gal"
+        ]
+    },
+    "glacier-eco-suds": {
+        "displayName": "Glacier Eco Suds",
+        "canonicalDescription": "High-sudsing dish detergent made with natural ingredients. Its balanced pH ensures a mild yet powerful clean, leaving dishes spotless and smelling fresh. Eco-friendly, economical, and tough on grease.",
+        "category": "Extra Sudsy, Kitchen, Pot & Pan Dishwashing Liquid",
+        "variants": [
+            "glacier-eco-suds-5-gal",
+            "glacier-eco-suds-4x1-gal"
+        ]
+    },
+    "glacier-power-suds": {
+        "displayName": "Glacier Power Suds",
+        "canonicalDescription": "High-sudsing dish detergent made with natural ingredients. Its balanced pH ensures mild yet effective cleaning, with long-lasting suds and a fresh, pleasant scent that outperforms other brands.",
+        "category": "Extra Sudsy, Kitchen, Pot & Pan Dishwashing Liquid",
+        "variants": [
+            "glacier-power-suds-4x1-gal",
+            "glacier-power-suds-5-gal"
+        ]
+    },
+    "household-ammonia": {
+        "displayName": "Household Ammonia",
+        "canonicalDescription": "Our Household Ammonia is a simple yet effective cleaning solution at household strength, perfect for tackling grease, grime, and stains throughout your home.",
+        "category": "All Purpose, Ammonia Cleaner, Household Cleaner",
+        "variants": [
+            "household-ammonia-4x1-gal"
+        ]
+    },
+    "isopropyl-alcohol": {
+        "displayName": "Isopropyl Alcohol",
+        "canonicalDescription": "Versatile and effective solvent widely used in various industries for cleaning, disinfecting, and de-greasing. Its rapid evaporation and hydrophobic properties make it ideal for applications where water sensitivity is crucial.",
+        "category": "Electronics Cleaning, Multi Purpose Raw Material, Varnish Cleaning",
+        "variants": [
+            "isopropyl-alcohol-99-4x1-gal",
+            "isopropyl-alcohol-99-5-gal",
+            "isopropyl-alcohol-70-5-gal"
+        ]
+    },
+    "nugget-xk-car-wash": {
+        "displayName": "Nugget XK Car Wash",
+        "canonicalDescription": "Highly concentrated car wash solution that's gentle on hands and perfect for automatic feed systems. With impressive wetting and detergent properties, it rinses free and leaves no films or spots upon drying.",
+        "category": "Automatic Car Wash, Automotive, Liquid Car Wash Concentrate",
+        "variants": [
+            "nugget-xk-car-wash-4x1-gal",
+            "nugget-xk-car-wash-5-gal"
+        ]
+    },
+    "sapphire": {
+        "displayName": "Sapphire",
+        "canonicalDescription": "Sapphire premium dishwashing detergent formulated for glassware and all dishwasher applications, delivering sparkling, streak-free results every time.",
+        "category": "Dishwasher Rinse Aid, Kitchen & Warewash, Laundry Detergent Emulsifier",
+        "variants": [
+            "sapphire-4x1-gal",
+            "sapphire-12x1-qt"
+        ]
+    },
+    "soft-suds-peach": {
+        "displayName": "Soft Suds Peach",
+        "canonicalDescription": "\\n A fragrant and foamy hand soap created for use in soap dispensers. \\n Soft suds produce firm but gentle foam. \\n Crafted for bulk hand soap. \\n",
+        "category": "Bathroom, HOUSEHOLD CLEANERS",
+        "variants": [
+            "soft-suds-peach-4x1-gal"
+        ]
+    },
+    "sparkle-rinse": {
+        "displayName": "Sparkle Rinse",
+        "canonicalDescription": "Sparkle Rinse is the closer your dish pit needs . A heavy-duty rinse aid from United Formulas, it leverages a potent Isopropanol base to flash-dry ware and eliminate overhead-killing water spots . This blue liquid cuts surface tension instantly, ensuring your glasses come out ready to serve without the wasted labor of hand-drying or re-washing",
+        "category": "All Purpose, Floor Care, Kitchen & Warewash",
+        "variants": [
+            "sparkle-rinse-4x1-gal",
+            "sparkle-rinse-5-gal"
+        ]
+    },
+    "super-soak": {
+        "displayName": "Super Soak",
+        "canonicalDescription": "Super Soak is a concentrated premium presoak for silverware and flatware. Formulated with enzymes, it removes tarnish, reverses oxidation, and eliminates food soils and protein deposits, restoring shine with just a short soak. Use 1 oz per gallon of water.",
+        "category": "Flatware Pre-Soak, Kitchen, Kitchen & Warewash, Silverware Pre-Soak",
+        "variants": [
+            "super-soak-4x10-lb"
+        ]
+    },
+    "trophy-car-wash": {
+        "displayName": "Trophy Car Wash",
+        "canonicalDescription": "Highly concentrated complete car wash effectively removes road film and leaves your car with a stunning, spot-free shine.",
+        "category": "Automotive, Liquid Car Wash",
+        "variants": [
+            "trophy-car-wash-5-gal",
+            "trophy-car-wash-55-gal"
+        ]
+    },
+    "jax": {
+        "displayName": "Jax",
+        "canonicalDescription": "Powerful all-purpose cleaner that’s safe for your hands and highly effective. Just 1/4 cup per gallon of water tackles tough jobs on floors, linoleum, tile, woodwork, and more. Ideal for all washable surfaces, including automobiles and appliances.",
+        "category": "All Purpose, All Purpose > All Purpose Cleaner, Ammonia Cleaner, Floor Care, Institutional Cleaner",
+        "variants": [
+            "jax-4x1-gal",
+            "jax-5-gal"
+        ]
+    },
+    "essential-blue-concentrate": {
+        "displayName": "Essential Blue Concentrate",
+        "canonicalDescription": "Mild pH cleaner perfect for heavily soiled finished floors and a wide range of washable surfaces. It’s non-dulling, free-rinsing, and low-foaming, ideal for neutralizing ice melt residue, removing soap scum, and preparing floors for re-coating.",
+        "category": "Floor Care, Heavy Duty No Rinse Cleaner",
+        "variants": []
+    },
+    "big-sky-concentrate": {
+        "displayName": "Big Sky Concentrate",
+        "canonicalDescription": "Big Sky Concentrate is a highly concentrated all-purpose cleaner designed to safely and effectively clean any hard surface. Economical and versatile, it works in all water types—hard or soft, hot or cold—making it ideal for general cleaning needs.",
+        "category": "All Purpose, Floor Cleaner, Multi Purpose Floor Cleaner",
+        "variants": [
+            "big-sky-concentrate-4x1-gal",
+            "big-sky-concentrate-5-gal"
+        ]
+    },
+    "delime": {
+        "displayName": "DeLime",
+        "canonicalDescription": "Delime is an extra-concentrated acid descaler and delimer formulated with phosphoric and hydrochloric acids to effectively remove hard water mineral scale deposits. Ideal for use on dishwashers, urinals, windows, and more, it offers non-foaming performance and powerful cleaning.",
+        "category": "De-Scaler, Industrial De-limer & De-scaler",
+        "variants": [
+            "delime-4x1-gal"
+        ]
+    },
+    "dynamo-x-commercial": {
+        "displayName": "Dynamo-X Commercial",
+        "canonicalDescription": "Dynamo-X Commercial is a ready-to-use, light-duty all-purpose cleaner ideal for tackling tough stains, grease, and grime. Designed for use on desks, auto bodies, walls, upholstery, and more, it is perfect for maintenance, food processing, transportation shops, and more. Its versatility reduces the need for specialized cleaners.",
+        "category": "All Purpose > All Purpose Cleaner, General Maintenance Commercial Purpose Cleaner, Multi Purpose Cleaner",
+        "variants": [
+            "dynamo-x-commercial-12x1-qt",
+            "dynamo-x-commercial-4x1-gal",
+            "dynamo-x-commercial-5-gal"
+        ]
+    },
+    "dynamo-x-professional": {
+        "displayName": "Dynamo-X Professional",
+        "canonicalDescription": "Dynamo-X Professional is a ready-to-use, professional-grade all-purpose cleaner designed to tackle tough stains, grease, and grime across a range of surfaces. Ideal for building maintenance, food processing, automotive shops, schools, and more, it delivers powerful cleaning performance and versatility.",
+        "category": "All Purpose > All Purpose Cleaner, Extra Strength Professional Purpose Cleaner, Multi Purpose Cleaner",
+        "variants": [
+            "dynamo-x-professional-12x1-qt",
+            "dynamo-x-professional-4x1-gal",
+            "dynamo-x-professional-5-gal"
+        ]
+    },
+    "dynamo-x-industrial": {
+        "displayName": "Dynamo-X Industrial",
+        "canonicalDescription": "Dynamo-X — Non-Flammable Heavy-Duty Cleaner, Degreaser & Stripper (Concentrate) \\nBuilt for baked-on grease, wax buildup, oxidation film, and smoke/soot cleanup. Dilute to strength (1:1 → 1:128)—one concentrate for heavy hits through light-duty cleaning.",
+        "category": "All Purpose > All Purpose Cleaner, Industrial Purpose Cleaner, Multi Purpose Cleaner",
+        "variants": [
+            "dynamo-x-industrial-12x1-qt",
+            "dynamo-x-industrial-4x1-gal",
+            "dynamo-x-industrial-5-gal"
+        ]
+    },
+    "multi-chlor": {
+        "displayName": "Multi-Chlor",
+        "canonicalDescription": "HASA Multi-Chlor is a 12.5% sodium hypochlorite solution designed for versatile applications, including pool sanitization, drinking water treatment, and mold control. NSF 60 certified, it is an effective and reliable solution for both residential and industrial sanitization needs.",
+        "category": "Chlorine, Kitchen & Warewash, Multi Purpose Chlorine Water Treatment, Sodium Hypochlorite",
+        "variants": [
+            "multi-chlor-4x1-gal"
+        ]
+    },
+    "liqui-chlor": {
+        "displayName": "Liqui-Chlor",
+        "canonicalDescription": "Liquichlor is an EPA-registered liquid bleach solution available nationwide. Offered in a variety of container sizes, it supports diverse applications, including algaecide, laundry bleaching, disinfecting, and water treatment. Convenient delivery and telemetry solutions ensure your supply is always ready.",
+        "category": "Bleach Cleaner, Cleaner, Industrial Purpose Cleaner, Kitchen & Warewash",
+        "variants": [
+            "liqui-chlor-5-gal"
+        ]
+    },
+    "champion": {
+        "displayName": "Champion",
+        "canonicalDescription": "Champion is a premium, concentrated machine dish soap. Biodegradable and septic-safe, it handles water hardness up to 500 ppm. Heavily chlorinated for maximum stain removal and sanitizing, Champion is perfect for home and commercial dishwashers.",
+        "category": "Biodegradable, Dish Wash Compound, Kitchen, Kitchen & Warewash",
+        "variants": [
+            "champion-25-lb"
+        ]
+    },
+    "industrapro": {
+        "displayName": "IndustraPro",
+        "canonicalDescription": "IndustraPro is a premium industrial laundry detergent designed to tackle tough industrial soils like oil, grease, and tar. Its concentrated formula works effectively on various fabrics in both hot and cold water, suitable for commercial and household washers.",
+        "category": "Industrial Detergent, Laundry",
+        "variants": [
+            "industrapro-25-lb"
+        ]
+    },
+    "nugget-car-wash": {
+        "displayName": "Nugget Car Wash",
+        "canonicalDescription": "Nugget Car Wash is a premium powdered detergent for both hand washing and pressure washing. Its neutral pH formula cleans effectively without harsh alkali, leaving car finishes clean, shiny, and free of film, even in hard water.",
+        "category": "Automotive, Car Wash Compound, Hand Car Washing, Pressure Car Washing",
+        "variants": [
+            "nugget-car-wash-20-lb"
+        ]
+    },
+    "liquid-ice-melt": {
+        "displayName": "Liquid Ice Melt",
+        "canonicalDescription": "Premium liquid ice met offering fast and effective de-icing for driveways, walkways, and more.",
+        "category": "Industrial Cleaners, Liquid Ice Melt, Winter",
+        "variants": [
+            "liquid-ice-melt-4x1-gal",
+            "liquid-ice-melt-5-gal"
+        ]
+    },
+    "boost": {
+        "displayName": "Boost",
+        "canonicalDescription": "Boost is an innovative liquid laundry product designed to elevate the cleaning power of detergents while prioritizing safety and efficiency. Its non-hazardous, non-alkaline formulation provides a safer alternative for handling tough laundry challenges, effectively removing embedded soils from fabrics without the harshness of traditional boosters.",
+        "category": "Laundry, Laundry Detergent Booster",
+        "variants": [
+            "boost-5-gal"
+        ]
+    },
+    "essential-2911-annihiliator": {
+        "displayName": "Essential  Annihilator",
+        "canonicalDescription": "Annihilator is a powerful, high-active formula designed to strip even the most stubborn finishes and seals, eliminating or reducing the need for machine scrubbing.",
+        "category": "pH7 No-Rinse Floor Cleaner",
+        "variants": [
+            "essential-2911-annihiliator-5-gal"
+        ]
+    },
+    "c-thru-concentrate": {
+        "displayName": "C-Thru Concentrate",
+        "canonicalDescription": "A versatile, streak-free window cleaner that delivers a sparkling finish on glass, stainless steel, chrome, and other polished surfaces.",
+        "category": "All Purpose, Windows",
+        "variants": [
+            "c-thru-concentrate-24x16-oz",
+            "c-thru-concentrate-4x1-gal"
+        ]
+    },
+    "windsheild-ice-melt-spray": {
+        "displayName": "Windshield Ice Melt Spray",
+        "canonicalDescription": "Quickly melts frost and light ice on windshields, effective down to -15°F for hassle-free winter mornings.",
+        "category": "Automotive, AUTOMOTIVE PRODUCTS, Windshield Ice Melt Spray",
+        "variants": [
+            "windsheild-ice-melt-spray-24x16-oz"
+        ]
+    },
+    "essential-nu-tral-cleaner": {
+        "displayName": "Essential Nu-Tral Cleaner",
+        "canonicalDescription": "A versatile, no-rinse cleaner designed for daily mopping, scrubbing, and cleaning of finished floors, walls, furniture, and equipment. Neutral pH ensures safe and effective use on a variety of surfaces.",
+        "category": "pH7 No-Rinse Floor Cleaner",
+        "variants": [
+            "essential-nu-tral-cleaner-4x1-gal"
+        ]
+    },
+    "x-coat-nano": {
+        "displayName": "X Coat Nano",
+        "canonicalDescription": "X-Coat Nano – Advanced Floor Finish \\n \\n \\n \\nX-Coat Nano incorporates patented nano-zinc technology, ensuring denser and more thorough cross-linking of the floor finish. This innovation enhances lay-down gloss, durability, and resistance to marks and soil, while reducing odors with its ammonia-free formula. Designed for versatility, X-Coat Nano is ideal for limited maintenance programs but responds beautifully to daily burnishing for a polished finish. \\n \\n \\n \\n Key Features: \\n \\n Innovative Nano-Zinc Technology: Provides superior gloss, durability, mark resistance, and soil resistance with enhanced cross-linking. \\n Low Odor: Ammonia-free formula for a dramatically reduced odor during application. \\n Eco-Friendly: Meets California’s 1% VOC Regulation with a low-emissions formula. \\n Fast Drying: Dries in 15–20 minutes under normal conditions, allowing for efficient application. \\n Slip-Resistant: UL Classified for safety. \\n High Coverage: Covers up to 3,000 square feet per gallon, offering exceptional value. \\n \\n Properties: \\n \\n Type: Acrylic Emulsion \\n Form: Opaque Liquid \\n Color: Milky White \\n pH: 8.0–8.5 \\n VOC Content: 0.59% \\n Dry Time: 15–20 minutes \\n Coverage: Up to 3,000 ft² per gallon \\n Storage Stability: 1 year (unopened) \\n \\n Application Instructions: \\n \\n Preparation: Strip floors using Xlerate™ Stripper (2917FX) as directed. Rinse thoroughly and let dry. \\n Application: Apply thin, even coats with clean equipment. Allow each coat to dry for 15–20 minutes. Apply a maximum of 4 coats in 24 hours. \\n \\n For optimal results, apply four coats on the first night, then four additional coats a few days later to achieve ideal film thickness. \\n \\n \\n Coverage: One gallon covers up to 3,000 square feet. \\n \\n Maintenance Guidelines: \\n \\n Daily Cleaning: Sweep or dust mop to remove grit and soil. \\n Routine Cleaning: Use Neutral Cleaner Plus (2746FC) or Blue Concentrate (2085FC). Rinse thoroughly and let dry. \\n Traffic Areas: Apply additional thin coats of X-Coat Nano as needed. \\n Burnishing: Periodically burnish with blended hair pads to enhance the finish. \\n Periodic Maintenance: Use Xlerate™ Stripper (2917FX) for complete stripping when necessary. \\n \\n Special Notes: \\n \\n X-Coat Nano is easy to apply with a standard finish mop and dries perfectly clear. \\n Ideal for high-traffic areas requiring lasting durability and high gloss. \\n Follow all label directions and OSHA/EPA guidelines when working with asbestos-containing tiles. \\n \\n \\n \\n Safety: \\n \\n Read label before use. Keep out of reach of children. For medical advice, provide the product container or label. Refer to SDS for complete safety instructions. \\n \\n Elevate the appearance and durability of your floors with X-Coat Nano, combining cutting-edge technology with eco-friendly performance.",
+        "category": "Extreme Performance Coating",
+        "variants": [
+            "x-coat-nano-5-gal"
+        ]
+    },
+    "strike-out": {
+        "displayName": "Strike Out",
+        "canonicalDescription": "Power through rust stains, scale deposits, and clogged drains with Strike Out. This powerful acidic cleaner is designed for reconditioning toilet fixtures, cleaning straps, and opening drains.",
+        "category": "Bathroom, Heavy Duty Cleaner, Kitchen & Warewash, No-Rinse Cleaner",
+        "variants": [
+            "strike-out-12x1-qt"
+        ]
+    },
+    "Delta Green": {
+        "displayName": "Delta Green Non-Slip Floor Cleaner",
+        "canonicalDescription": "DeltaGreen® Non-Slip Floor Cleaner delivers dependable cleaning power with an emphasis on safety, simplicity, and everyday usability—making it a practical choice for facilities that prioritize clean floors and confident footing.",
+        "category": "Floor Care",
+        "variants": []
     }
 }

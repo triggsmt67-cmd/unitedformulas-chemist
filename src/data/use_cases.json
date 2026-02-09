@@ -1,0 +1,64 @@
+[
+    {
+        "issue": "wine stains",
+        "solution": "Brite OEB is highly effective for removing wine and other organic/protein stains from fabrics. Use as directed in a laundry cycle.",
+        "products": [
+            "brite-oeb",
+            "brite-oeb-plus",
+            "brite-oeb-super"
+        ]
+    },
+    {
+        "issue": "coffee stains",
+        "solution": "Use Brite OEB or Oxy Brite for organic stains like coffee on fabrics. For hard surfaces, use R&R Degreaser if the stain is persistent.",
+        "products": [
+            "brite-oeb",
+            "oxy-brite-pf"
+        ]
+    },
+    {
+        "issue": "grease on floors",
+        "solution": "Delta Green is our specialized non-slip floor cleaner for kitchens. For heavy industrial grease, use Dynamo-X or R&R Degreaser.",
+        "products": [
+            "delta-green-concentrate",
+            "dynamo-x",
+            "rr-degreaser"
+        ]
+    },
+    {
+        "issue": "hard water buildup",
+        "solution": "Bath Butler is designed specifically to remove lime and hard water deposits safely from fixtures.",
+        "products": [
+            "bath-butler"
+        ]
+    },
+    {
+        "issue": "protein stains",
+        "solution": "Brite OEB contains enzymes specifically designed to break down protein-based stains like blood, grass, and food.",
+        "products": [
+            "brite-oeb"
+        ]
+    },
+    {
+        "issue": "rust",
+        "solution": "Use Calcium Lime Rust Remover for mineral and oxidation stains on compatible hard surfaces.",
+        "products": [
+            "calcium-lime-rust-remover"
+        ]
+    },
+    {
+        "issue": "blood stains",
+        "solution": "Brite OEB or Shot Maker are excellent for removing blood and organic soils from laundry.",
+        "products": [
+            "brite-oeb",
+            "shot-maker"
+        ]
+    },
+    {
+        "issue": "gym floors",
+        "solution": "For gym floors (usually rubber or wood), Maintenance Master is our go-to neutral cleaner. It cleans without leaving a film or dulling the finish, making it safe for daily use on athletic surfaces.",
+        "products": [
+            "maintenance-master"
+        ]
+    }
+]

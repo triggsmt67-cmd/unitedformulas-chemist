@@ -142,7 +142,7 @@ export async function POST(req: NextRequest) {
         if (!metadata) {
             console.log("Fetching fresh GCS metadata...");
             // Run GCS calls in parallel to save time
-            const [filesRepo, guideContent, zipcodesContent] = await Promise.all([
+            const [filesRepo, guideContent, zipcodesContent, useCasesContent] = await Promise.all([
                 storage.bucket(bucketName).getFiles(),
                 (async () => {
                     try {
@@ -167,6 +167,18 @@ export async function POST(req: NextRequest) {
                         console.warn('Failed to load delivery_zipcodes.json:', err);
                         return "";
                     }
+                })(),
+                (async () => {
+                    try {
+                        const localPath = path.join(process.cwd(), 'src/data/use_cases.json');
+                        if (fs.existsSync(localPath)) {
+                            return fs.readFileSync(localPath, 'utf-8');
+                        }
+                        return "[]";
+                    } catch (err) {
+                        console.warn('Failed to load use_cases.json:', err);
+                        return "[]";
+                    }
                 })()
             ]);
 
@@ -174,14 +186,13 @@ export async function POST(req: NextRequest) {
                 fileList: filesRepo[0].map((f: any) => f.name).join('\n'),
                 files: filesRepo[0],
                 productGuide: guideContent,
-                zipcodes: zipcodesContent
+                zipcodes: zipcodesContent,
+                useCases: useCasesContent
             };
 
             // Local fallback for product guide if GCS is empty
             if (!metadata.productGuide) {
                 try {
-                    const fs = require('fs');
-                    const path = require('path');
                     const localPath = path.join(process.cwd(), 'product_guide_harvested.txt');
                     if (fs.existsSync(localPath)) {
                         metadata.productGuide = fs.readFileSync(localPath, 'utf-8');
@@ -192,55 +203,63 @@ export async function POST(req: NextRequest) {
                 }
             }
 
-            console.log(`Metadata loaded. Guide length: ${metadata.productGuide?.length || 0}`);
+            console.log(`Metadata loaded. Guide length: ${metadata.productGuide?.length || 0}. Use Cases: ${JSON.parse(metadata.useCases || "[]").length}`);
             cache.set('gcs_metadata', metadata);
         }
 
-        const { fileList, files, productGuide, zipcodes } = metadata;
+        const { fileList, files, productGuide, zipcodes, useCases } = metadata;
+        const premiumKeys = Object.keys(JSON.parse(fs.readFileSync(path.join(process.cwd(), 'src/data/product_metadata.json'), 'utf-8'))).join(', ');
 
         // 2. Step 1: Identify Relevant File
         const recentHistory = history.slice(-6).map((h: any) => `${h.role}: ${h.content}`).join('\n');
         const selectionPrompt = `
       You are the "Master Librarian" for United Formulas. 
-      Your job is to pick the BEST file to answer the user's question.
+      Your job is to pick the BEST file or knowledge source to answer the user's question.
 
       RECENT CONTEXT:
       ${recentHistory}
 
       USER QUESTION: "${message}"
 
+      PREMIUM PRODUCTS (Use these names if mentioned):
+      ${premiumKeys}
+
       PRODUCT GUIDE (MAPPING names to technical files):
       ${productGuide}
+
+      DIRECT USE-CASE SOLUTIONS:
+      ${useCases}
 
       AVAILABLE FILES:
       ${fileList}
 
       SELECTION RULES:
-      1. SEARCH & TYPOS (TOP PRIORITY): If the user is searching for a category, use-case, or chemical (e.g. "car wash", "karr wassh", "asphlat", "flore soap", "dish soap", "degreaser", "pot and pan", "clner"), RETURN "GUIDE".
-      2. DIRECT MATCH: If a product name is mentioned (e.g. "Nugget Car Wash", "Ace"), pick its grounding file.
-      3. PRONOUNS: If the user says "it", "this", "that", "the product", resolve it to the specific product from RECENT CONTEXT and pick its file. 
-      4. CATEGORY MAPPINGS: Be EXTREMELY aggressive with typos. 
-         - Any mention of "wash", "wassh", "cleaner", "clner", "soap", "detergent", "degreaser", "acid", "caustic", "sanitizer" -> GUIDE
-      5. CLARIFY: Only return "CLARIFY" if they ask a technical/safety question ("Is it toxic?") but no product name has been mentioned yet and context is empty.
-      6. RETURN ONLY THE FILENAME or "GUIDE" or "DELIVERY" or "CLARIFY" or "NONE" or "GENERAL".
+      1. DELIVERY/ORDERING: If the user asks about delivery, ordering, shipping, or receiving more of a product (even if misspelled like "delever"), RETURN "DELIVERY".
+      2. USE-CASE MATCH: If the user describes a problem (e.g. "wine stains", "grease"), check DIRECT USE-CASE SOLUTIONS. If a match is found, RETURN "USECARE".
+      3. SEARCH & TYPOS: If the user is searching for a category, chemical, or use-case, RETURN "GUIDE".
+      4. DIRECT MATCH: If a product name is mentioned (e.g. "Nugget Car Wash", "Ace", "Delta Green"), pick its grounding file.
+      5. PRONOUNS: Resolve "it", "this", "that" to the previous context.
+      6. CLARIFY: Only return "CLARIFY" if they ask a technical/safety question ("Is it toxic?") but no product name has been mentioned yet.
+      7. RETURN ONLY THE FILENAME or "USECARE" or "GUIDE" or "DELIVERY" or "CLARIFY" or "NONE" or "GENERAL".
     `;
 
         // Safety Catch-all for Category Searches (Fuzzy Support)
         const qLower = message.toLowerCase();
-        const categoryKeywords = ['wash', 'cleaner', 'clner', 'wassh', 'soap', 'detergent', 'degreas', 'acid', 'caustic', 'sanitiz', 'mop', 'wax', 'polish', 'dish'];
+        const categoryKeywords = ['wash', 'cleaner', 'clner', 'wassh', 'soap', 'detergent', 'degreas', 'acid', 'caustic', 'sanitiz', 'mop', 'wax', 'polish', 'dish', 'stain', 'remove', 'solution', 'floor', 'gym'];
         const isLikelySearch = categoryKeywords.some(k => qLower.includes(k));
 
         let selectedFile = "";
-        if (isLikelySearch) {
-            console.log("Category keyword detected, forcing GUIDE mode.");
+        const selectionResult = await modelFlash.generateContent(selectionPrompt);
+        selectedFile = selectionResult.response.text().trim();
+
+        // If Gemini didn't pick something specific but it's a general keyword search, fallback to GUIDE
+        if (isLikelySearch && !['USECARE', 'DELIVERY', 'CLARIFY'].includes(selectedFile.toUpperCase())) {
+            console.log("Category keyword detected and no specific match, focusing on GUIDE.");
             selectedFile = "GUIDE";
-        } else {
-            const selectionResult = await modelFlash.generateContent(selectionPrompt);
-            selectedFile = selectionResult.response.text().trim();
         }
 
         // Robust cleanup: find the FIRST occurrence of a valid keyword
-        const keywords = ['GUIDE', 'DELIVERY', 'CLARIFY', 'NONE', 'GENERAL'];
+        const keywords = ['USECARE', 'GUIDE', 'DELIVERY', 'CLARIFY', 'NONE', 'GENERAL'];
         const upperSelected = selectedFile.toUpperCase();
         for (const kw of keywords) {
             if (upperSelected.includes(kw)) {
@@ -252,6 +271,18 @@ export async function POST(req: NextRequest) {
         // Final fallback cleanup for filenames (remove markdown/quotes)
         selectedFile = selectedFile.replace(/```(?:\w+)?/g, '').replace(/['"`]/g, '').split('\n')[0].trim();
 
+        // Final validation: Is it a keyword or a real file?
+        const isKnownKeyword = keywords.includes(selectedFile);
+        const isRealFile = fileList.includes(selectedFile);
+
+        if (!isKnownKeyword && !isRealFile) {
+            // If it's a long sentence, it's definitely not a match
+            if (selectedFile.length > 100 || selectedFile.includes(' ')) {
+                console.log(`Gemini was too chatty or missed: "${selectedFile}". Falling back to NONE.`);
+                selectedFile = isLikelySearch ? "GUIDE" : "NONE";
+            }
+        }
+
         console.log(`Final Selected Context: ${selectedFile}`);
 
         let contextData = "No specific technical record found. Answer based on general knowledge or ask for clarification if a product is needed.";
@@ -259,6 +290,8 @@ export async function POST(req: NextRequest) {
         // 3. Step 2: Retrieve & Parse Content
         if (selectedFile === 'CLARIFY') {
             contextData = "STATUS: NO PRODUCT NAMED. You MUST ask which product they are referring to before providing safety or technical details. Do not guess the product.";
+        } else if (selectedFile === 'USECARE') {
+            contextData = `STATUS: PROBLEM SOLVED. Use Case Mappings:\n${useCases}\n\nProvide the specific solution listed for the matching problem. Acknowledge the problem directly.`;
         } else if (selectedFile === 'GUIDE') {
             contextData = `STATUS: PRODUCT IDENTIFIED (CATALOG). FULL PRODUCT CATALOG & MAPPING GUIDE:\n${productGuide}`;
         } else if (selectedFile === 'DELIVERY') {
@@ -302,16 +335,19 @@ export async function POST(req: NextRequest) {
             // 2. Normalize spaces to hyphens for matching
             // 3. Handle cases where the filename is "Delta Green" (spaces) vs "delta-green" (hyphens)
             const cleanName = selectedFile.split('/').pop()?.replace(/grounding__|sku_master__|.txt|.pdf/g, '') || "";
-            const fileKey = cleanName.toLowerCase().split('__')[0].trim().replace(/\s+/g, '-');
+            // Normalize underscores to hyphens for matching with metadata keys
+            const fileKey = cleanName.toLowerCase().replace(/_/g, '-').split('__')[0].trim().replace(/\s+/g, '-');
 
             console.log(`Searching metadata for slug: ${fileKey} (from file: ${selectedFile})`);
 
             for (const [key, details] of Object.entries(metadata) as [string, any]) {
-                // Direct match OR Variant match OR Partial match for base products
-                // matches "delta-green-concentrate" against "delta-green"
-                if (key === fileKey ||
-                    (details.variants && details.variants.some((v: string) => v === fileKey || fileKey.startsWith(v))) ||
-                    (fileKey.startsWith(key))
+                const normalizedKey = key.toLowerCase().replace(/_/g, '-');
+
+                // Direct match OR Variant match OR Partial match
+                if (normalizedKey === fileKey ||
+                    (details.variants && details.variants.some((v: string) => v.toLowerCase().replace(/_/g, '-') === fileKey)) ||
+                    fileKey.startsWith(normalizedKey) ||
+                    normalizedKey.startsWith(fileKey)
                 ) {
                     premiumMatch = details;
                     console.log(`Match found: ${key}`);
@@ -349,8 +385,8 @@ export async function POST(req: NextRequest) {
             
             PREMIUM BRANDED DATA (MANDATORY FOR OVERVIEW):
             - Product Name: ${premiumMatch?.displayName || selectedFile}
-            - Category: ${premiumMatch?.category || "Unknown"}
-            - Official Description: ${premiumMatch?.canonicalDescription || "No premium description available yet. Summarize technical record instead."}
+            - Category: ${premiumMatch?.category || "Industrial Cleaner"}
+            - Official Description: ${premiumMatch?.canonicalDescription || "I am currently retrieving the full branded details for this product. See the technical safety data below for immediate guidance."}
             - VARIANTS / SIZES: ${variantList} (If user asks about sizes, LIST THESE EXACTLY)
             
             TECHNICAL RECORD (SDS/TECHNICAL DATA):
@@ -378,18 +414,32 @@ export async function POST(req: NextRequest) {
       2. PROHIBITION: Do NOT include first aid instructions, medical disclaimers, or any "NOTE: In a medical emergency..." text unless specifically requested for safety guidance. Do not repeat the 911 emergency note in general conversation.
       3. GENERAL PRODUCT INFO: If asked "Tell me about [Product]", provide a concise, one-sentence high-level overview.
       4. DIRECTNESS: Provide technical answers immediately. Do NOT ask "Are you referring to..." if they named the product.
-      5. STATUS: NO PRODUCT NAMED: Ask "Which United Formulas product are you using or considering?"
+      5. STATUS: NO PRODUCT NAMED: 
+         - If the user asked a general question (e.g. "how do I clean floors?"), ask expert follow-up questions to help them choose the right product. (e.g. "What type of floor are you cleaning—wood, tile, or rubber?")
+         - Otherwise, ask: "Which United Formulas product are you using or considering?"
       6. STATUS: PRODUCT IDENTIFIED (TECHNICAL): Use the retrieved technical data to provide professional, precise guidance.
 
       ────────────────────────────────
-      DELIVERY & ZIPCODES:
+      DELIVERY & LOGISTICS:
       ────────────────────────────────
-      - If delivery but no location: Ask for city or zip.
-      - IF FOUND in list: Confirm city and county.
-      - IF NOT FOUND: Direct to support.
+      - If the user asks for delivery, shipping, or "more" of a product:
+        1. Ask for their City or Zip Code if you don't have it.
+        2. Check the provided ZIPCODES list.
+        3. IF FOUND: Confirm we deliver there and suggest contacting the local rep.
+        4. IF NOT FOUND: Politely state we may not deliver directly there but to check with support.
+
+      ────────────────────────────────
+      LEAD GENERATION & ETIQUETTE:
+      ────────────────────────────────
+      1. NAME CAPTURE (AFTER 2-3 MESSAGES): If the user has not introduced themselves, politely ask for their name. (e.g. "By the way, I'd love to know who I'm speaking with. May I ask your name?")
+      2. EMAIL & CATALOGUE OFFER: Subsequent to name capture, or after 4-5 messages total, offer to send our "Complete Product Catalogue." Ask for their email address to send it. (e.g. "I'd love to send you our full product catalogue for your records. What is the best email address to send that to?")
+      3. ADDRESSING THE USER: Use their name naturally in responses ONLY if they have explicitly provided it in the chat history.
+      4. STRICT PROHIBITION: NEVER guess, assume, or invent a name. You must only use a name if the user has explicitly stated it to you in THIS conversation.
 
       RETRIEVED DATA FOR YOUR USE (DO NOT MENTION SOURCE):
       ${contextData}
+
+      CURRENT CONVERSATION LENGTH: ${history.length} messages.
     `;
 
         // Initialize model with system instruction

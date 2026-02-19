@@ -226,14 +226,39 @@ export default function ChatWidget() {
                                         >
                                             <ReactMarkdown
                                                 components={{
-                                                    a: ({ node, ...props }) => (
-                                                        <a
-                                                            {...props}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className="text-blue-600 hover:text-blue-800 underline font-bold decoration-blue-500/30 underline-offset-4"
-                                                        />
-                                                    ),
+                                                    a: ({ node, ...props }) => {
+                                                        const href = props.href?.toLowerCase() || '';
+                                                        const isUnsafe = href.startsWith('javascript:') || href.startsWith('data:') || href.startsWith('vbscript:');
+                                                        const isSDS = !isUnsafe && (
+                                                            props.children?.toString().toLowerCase().includes('sds') ||
+                                                            href.endsWith('.pdf') ||
+                                                            href.includes('grounding')
+                                                        );
+
+                                                        if (isSDS) {
+                                                            return (
+                                                                <a
+                                                                    {...props}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="mt-4 flex items-center justify-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-slate-800 transition-all no-underline group shadow-lg shadow-slate-200"
+                                                                >
+                                                                    <Icon icon="ph:file-pdf-fill" className="text-lg text-emerald-400" />
+                                                                    <span>{props.children}</span>
+                                                                    <Icon icon="ph:arrow-square-out-bold" className="text-sm opacity-50 group-hover:opacity-100" />
+                                                                </a>
+                                                            );
+                                                        }
+
+                                                        return (
+                                                            <a
+                                                                {...props}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="text-blue-600 hover:text-blue-800 underline font-bold decoration-blue-500/30 underline-offset-4"
+                                                            />
+                                                        );
+                                                    },
                                                 }}
                                             >
                                                 {msg.content}

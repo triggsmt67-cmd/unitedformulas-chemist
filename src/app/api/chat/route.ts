@@ -142,7 +142,7 @@ export async function POST(req: NextRequest) {
         if (!metadata) {
             console.log("Fetching fresh GCS metadata...");
             // Run GCS calls in parallel to save time
-            const [filesRepo, guideContent, zipcodesContent, useCasesContent] = await Promise.all([
+            const [filesRepo, guideContent, zipcodesContent, useCasesContent, productMetadataContent] = await Promise.all([
                 storage.bucket(bucketName).getFiles(),
                 (async () => {
                     try {
@@ -179,6 +179,18 @@ export async function POST(req: NextRequest) {
                         console.warn('Failed to load use_cases.json:', err);
                         return "[]";
                     }
+                })(),
+                (async () => {
+                    try {
+                        const metadataPath = path.join(process.cwd(), 'src/data/product_metadata.json');
+                        if (fs.existsSync(metadataPath)) {
+                            return JSON.parse(fs.readFileSync(metadataPath, 'utf8'));
+                        }
+                        return {};
+                    } catch (err) {
+                        console.error("Error loading product metadata:", err);
+                        return {};
+                    }
                 })()
             ]);
 
@@ -187,7 +199,8 @@ export async function POST(req: NextRequest) {
                 files: filesRepo[0],
                 productGuide: guideContent,
                 zipcodes: zipcodesContent,
-                useCases: useCasesContent
+                useCases: useCasesContent,
+                productMetadata: productMetadataContent
             };
 
             // Local fallback for product guide if GCS is empty
@@ -207,8 +220,8 @@ export async function POST(req: NextRequest) {
             cache.set('gcs_metadata', metadata);
         }
 
-        const { fileList, files, productGuide, zipcodes, useCases } = metadata;
-        const premiumKeys = Object.keys(JSON.parse(fs.readFileSync(path.join(process.cwd(), 'src/data/product_metadata.json'), 'utf-8'))).join(', ');
+        const { fileList, files, productGuide, zipcodes, useCases, productMetadata } = metadata;
+        const premiumKeys = Object.keys(productMetadata).join(', ');
 
         // 2. Step 1: Identify Relevant File
         const recentHistory = history.slice(-6).map((h: any) => `${h.role}: ${h.content}`).join('\n');
@@ -241,11 +254,13 @@ export async function POST(req: NextRequest) {
       5. PRONOUNS: Resolve "it", "this", "that" to the previous context.
       6. CLARIFY: Only return "CLARIFY" if they ask a technical/safety question ("Is it toxic?") but no product name has been mentioned yet.
       7. RETURN ONLY THE FILENAME or "USECARE" or "GUIDE" or "DELIVERY" or "CLARIFY" or "NONE" or "GENERAL".
+
+      CRITICAL: If the user is asking for a recommendation (e.g. "what do you recommend for...", "I need a good...", "how do I clean..."), ALWAYS RETURN "GUIDE". Do NOT return "CLARIFY" for recommendation or general help requests.
     `;
 
         // Safety Catch-all for Category Searches (Fuzzy Support)
         const qLower = message.toLowerCase();
-        const categoryKeywords = ['wash', 'cleaner', 'clner', 'wassh', 'soap', 'detergent', 'degreas', 'acid', 'caustic', 'sanitiz', 'mop', 'wax', 'polish', 'dish', 'stain', 'remove', 'solution', 'floor', 'gym'];
+        const categoryKeywords = ['wash', 'cleaner', 'clner', 'wassh', 'soap', 'detergent', 'degreas', 'acid', 'caustic', 'sanitiz', 'disinfect', 'mop', 'wax', 'polish', 'dish', 'stain', 'remove', 'solution', 'floor', 'gym'];
         const isLikelySearch = categoryKeywords.some(k => qLower.includes(k));
 
         let selectedFile = "";
@@ -293,7 +308,7 @@ export async function POST(req: NextRequest) {
         } else if (selectedFile === 'USECARE') {
             contextData = `STATUS: PROBLEM SOLVED. Use Case Mappings:\n${useCases}\n\nProvide the specific solution listed for the matching problem. Acknowledge the problem directly.`;
         } else if (selectedFile === 'GUIDE') {
-            contextData = `STATUS: PRODUCT IDENTIFIED (CATALOG). FULL PRODUCT CATALOG & MAPPING GUIDE:\n${productGuide}`;
+            contextData = `STATUS: CATALOG_SEARCH. FULL PRODUCT CATALOG & MAPPING GUIDE:\n${productGuide}`;
         } else if (selectedFile === 'DELIVERY') {
             let parsedZips: any[] = [];
             try {
@@ -317,18 +332,7 @@ export async function POST(req: NextRequest) {
         } else if (selectedFile !== 'NONE' && selectedFile !== 'GENERAL' && selectedFile.length > 0) {
             contextData = `STATUS: PRODUCT IDENTIFIED.`;
 
-            // Load Premium Metadata (Marketing/Canonical Descriptions)
-            let metadata: any = {};
-            try {
-                const metadataPath = path.join(process.cwd(), 'src/data/product_metadata.json');
-                if (fs.existsSync(metadataPath)) {
-                    metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf8'));
-                }
-            } catch (err) {
-                console.error("Error loading product metadata:", err);
-            }
-
-            // Find match in metadata (including variants)
+            // Use the already-loaded productMetadata from cache
             let premiumMatch: any = null;
             // Improved Slug Logic:
             // 1. Clean up file extensions and prefixes
@@ -340,7 +344,7 @@ export async function POST(req: NextRequest) {
 
             console.log(`Searching metadata for slug: ${fileKey} (from file: ${selectedFile})`);
 
-            for (const [key, details] of Object.entries(metadata) as [string, any]) {
+            for (const [key, details] of Object.entries(productMetadata) as [string, any]) {
                 const normalizedKey = key.toLowerCase().replace(/_/g, '-');
 
                 // Direct match OR Variant match OR Partial match
@@ -386,6 +390,7 @@ export async function POST(req: NextRequest) {
             PREMIUM BRANDED DATA (MANDATORY FOR OVERVIEW):
             - Product Name: ${premiumMatch?.displayName || selectedFile}
             - Category: ${premiumMatch?.category || "Industrial Cleaner"}
+            - SDS Link: https://storage.googleapis.com/${bucketName}/${encodeURIComponent(selectedFile)}
             - Official Description: ${premiumMatch?.canonicalDescription || "I am currently retrieving the full branded details for this product. See the technical safety data below for immediate guidance."}
             - VARIANTS / SIZES: ${variantList} (If user asks about sizes, LIST THESE EXACTLY)
             
@@ -411,13 +416,26 @@ export async function POST(req: NextRequest) {
       OPERATIONAL CLARIFICATION RULES:
       ────────────────────────────────
       1. FIRST AID & MEDICAL DISCLAIMER (STRICT): If (and ONLY IF) the user explicitly asks about first aid, exposure, or medical treatment, you MUST start your response with this EXACT sentence: "I am not a medical provider and cannot give medical advice, but here are the first aid instructions directly from our Safety Data Sheet (SDS) for this chemical:"
+         - Follow this immediately with the relevant first aid sections (e.g., EYE CONTACT, SKIN CONTACT) from the technical data.
+         - You MUST include a link to the SDS sheet (provided in the SDS Link below) at the very bottom of your response, formatted as: "[View Official SDS Sheet](URL)"
       2. PROHIBITION: Do NOT include first aid instructions, medical disclaimers, or any "NOTE: In a medical emergency..." text unless specifically requested for safety guidance. Do not repeat the 911 emergency note in general conversation.
       3. GENERAL PRODUCT INFO: If asked "Tell me about [Product]", provide a concise, one-sentence high-level overview.
       4. DIRECTNESS: Provide technical answers immediately. Do NOT ask "Are you referring to..." if they named the product.
-      5. STATUS: NO PRODUCT NAMED: 
-         - If the user asked a general question (e.g. "how do I clean floors?"), ask expert follow-up questions to help them choose the right product. (e.g. "What type of floor are you cleaning—wood, tile, or rubber?")
-         - Otherwise, ask: "Which United Formulas product are you using or considering?"
-      6. STATUS: PRODUCT IDENTIFIED (TECHNICAL): Use the retrieved technical data to provide professional, precise guidance.
+      5. STATUS: CATALOG_SEARCH:
+         - The user is asking for a recommendation or searching for a solution.
+         - PROACTIVE STEP: Scan the provided CATALOG & MAPPING GUIDE for 2-3 specific products that match their needs and SUGGEST THEM IMMEDIATELY.
+         - CONSULTATIVE STEP: After suggesting potential products, ask 1-2 follow-up questions to refine the choice (e.g. surface type, environment).
+         - EXAMPLE: "For a disinfectant, I recommend looking at **Bio-Maxx** or **Multi-Chlor**. To give you the best advice, what specific surfaces are you cleaning?"
+      6. STATUS: NO PRODUCT NAMED: 
+         - If the user is asking a technical, safety, or first-aid question that requires specific SDS data but hasn't named a product, politely ask: "Which United Formulas product are you using or considering?" so you can provide the correct safety information.
+      7. STATUS: PRODUCT IDENTIFIED (TECHNICAL): Use the retrieved technical data to provide professional, precise guidance.
+
+      ────────────────────────────────
+1. CONTACT & SUPPORT (MANDATORY): If the user asks for contact info, a representative, how to order, or where to find more help:
+         - **Phone**: 406.727.4144 (Available Mon-Fri, 8am-5pm MT)
+         - **Email**: sales@unitedformulas.com
+         - **Address**: PO BOX 2589, Great Falls, MT 59403
+         - ALWAYS provide these details directly. Do NOT say "I don't have this information."
 
       ────────────────────────────────
       DELIVERY & LOGISTICS:
@@ -425,8 +443,8 @@ export async function POST(req: NextRequest) {
       - If the user asks for delivery, shipping, or "more" of a product:
         1. Ask for their City or Zip Code if you don't have it.
         2. Check the provided ZIPCODES list.
-        3. IF FOUND: Confirm we deliver there and suggest contacting the local rep.
-        4. IF NOT FOUND: Politely state we may not deliver directly there but to check with support.
+        3. IF FOUND: Confirm we deliver there and suggest contacting the local rep at 406.727.4144 or sales@unitedformulas.com to place an order.
+        4. IF NOT FOUND: Politely state we may not deliver directly there but to check with our team at 406.727.4144.
 
       ────────────────────────────────
       LEAD GENERATION & ETIQUETTE:

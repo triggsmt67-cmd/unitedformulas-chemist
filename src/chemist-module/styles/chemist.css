@@ -1,0 +1,33 @@
+/* 
+  UF Chemist: Modular Style Guide
+  These styles are required for the glassmorphism and industrial sci-fi effects 
+  of the ChatWidget. Add these to your global CSS or import this file.
+*/
+
+.chemist-glass {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.chemist-glow {
+  text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+.chemist-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.chemist-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chemist-scrollbar::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 10px;
+}
+
+.chemist-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #cbd5e1;
+}

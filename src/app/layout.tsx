@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import ChatWidget from "@/components/ChatWidget";
+import "@/chemist-module/styles/chemist.css";
+import ChatWidget from "@/chemist-module/ui/ChatWidget";
 
 export const metadata: Metadata = {
   title: "UF Chemist | Industrial Laboratory Assistant",

@@ -3,8 +3,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Icon } from '@iconify/react';
-
 import ReactMarkdown from 'react-markdown';
+import { saveLead } from '@/lib/firebase';
 
 export default function ChatWidget() {
     const [isOpen, setIsOpen] = useState(false);
@@ -17,8 +17,9 @@ export default function ChatWidget() {
     ]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [user, setUser] = useState<{ name: string; email: string } | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
-
+    
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
@@ -29,6 +30,17 @@ export default function ChatWidget() {
         }
     }, [messages, isOpen]);
 
+    const clearChat = () => {
+        setMessages([
+            {
+                role: 'assistant',
+                content: "I am Dr. Aris. I'm here to help you get clear, safe answers about our products—and I'll slow things down if details really matter.",
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            }
+        ]);
+        setUser(null);
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!input.trim() || isLoading) return;
@@ -36,6 +48,36 @@ export default function ChatWidget() {
         const userMessage = input.trim();
         const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         setInput('');
+        
+        // --- Lead Capture Logic ---
+        const lastAssistantMsg = messages[messages.length - 1]?.content.toLowerCase();
+        let updatedUser = { ...user } as { name: string; email: string };
+        let infoCaptured = false;
+
+        // Simple Lead Capture: Check if user provided email
+        const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
+        const emailMatch = userMessage.match(emailRegex);
+        if (emailMatch && (!user || user.email !== emailMatch[0])) {
+            updatedUser.email = emailMatch[0];
+            infoCaptured = true;
+        }
+
+        // Simple Lead Capture: Check if user provided name (if assistant just asked)
+        if (lastAssistantMsg?.includes('your name') || lastAssistantMsg?.includes('who i\'m speaking with')) {
+            const cleanName = userMessage.replace(/my name is|i'm|i am/gi, '').trim();
+            if (cleanName && (!user || user.name !== cleanName)) {
+                updatedUser.name = cleanName;
+                infoCaptured = true;
+            }
+        }
+
+        if (infoCaptured) {
+            setUser(updatedUser);
+            // Non-blocking save to Firebase
+            saveLead(updatedUser.name || 'Conversation Lead', updatedUser.email || 'No Email').catch(console.error);
+        }
+        // -------------------------
+
         setMessages(prev => [...prev, { role: 'user', content: userMessage, timestamp }]);
         setIsLoading(true);
 
@@ -54,7 +96,6 @@ export default function ChatWidget() {
             const data = await response.json();
 
             if (data.error) {
-                // Pass the code/details if strictly needed, or just throw the message
                 const err: any = new Error(data.error);
                 err.code = data.code;
                 throw err;
@@ -67,16 +108,7 @@ export default function ChatWidget() {
             }]);
         } catch (error: any) {
             console.error('Chat error:', error);
-
             let errorMessage = "Oops! Something went wrong on my end. Let's try that again.";
-            if (error.code === 'RATE_LIMITED') {
-                errorMessage = "You're sending messages too quickly. Please wait a moment before trying again.";
-            } else if (error.code === 'VALIDATION_ERROR') {
-                errorMessage = "Your message is too long or invalid. Please try a shorter question.";
-            } else if (error.code === 'CONFIGURATION_ERROR') {
-                errorMessage = "I'm currently undergoing maintenance. Please check back shortly.";
-            }
-
             setMessages(prev => [...prev, {
                 role: 'assistant',
                 content: errorMessage,
@@ -85,16 +117,6 @@ export default function ChatWidget() {
         } finally {
             setIsLoading(false);
         }
-    };
-
-    const clearChat = () => {
-        setMessages([
-            {
-                role: 'assistant',
-                content: "I am Dr. Aris. I'm here to help you get clear, safe answers about our products—and I'll slow things down if details really matter.",
-                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            }
-        ]);
     };
 
     return (
@@ -124,7 +146,7 @@ export default function ChatWidget() {
                                 <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-600/50 to-cyan-600/50 rounded-full blur opacity-40 group-hover:opacity-100 transition duration-1000" />
                                 <div className="relative px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-full flex items-center gap-3 shadow-2xl">
                                     <span className="text-[10px] font-black tracking-[0.2em] text-white uppercase whitespace-nowrap">
-                                        Product & Safety Info
+                                        Ask The Chemist
                                     </span>
                                     <div className="flex space-x-1">
                                         <div className="w-1 h-1 rounded-full bg-blue-400 animate-ping" />
@@ -138,7 +160,7 @@ export default function ChatWidget() {
                 <button
                     onClick={() => setIsOpen(!isOpen)}
                     className="relative flex h-16 w-16 items-center justify-center rounded-full bg-slate-900 text-white shadow-2xl transition-all hover:scale-110 active:scale-95 group overflow-hidden border border-slate-700"
-                    aria-label="Open Chemical Safety Intelligence"
+                    aria-label="Ask The Chemist"
                 >
                     <div className="absolute inset-0 bg-gradient-to-tr from-[#0052cc]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                     {isOpen ? (
@@ -158,9 +180,8 @@ export default function ChatWidget() {
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
                         className="fixed bottom-24 right-6 z-50 flex h-[min(900px,88vh)] w-[min(650px,95vw)] flex-col overflow-hidden rounded-[40px] border border-white/20 bg-white/95 backdrop-blur-xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)]"
                     >
-                        {/* Header: Dr. Aris Laboratory UI */}
+                        {/* Header */}
                         <div className="relative h-44 w-full overflow-hidden">
-                            {/* Background Image with Blur and Overlay */}
                             <img
                                 src="/dr_aris_bg.png"
                                 alt="Laboratory"
@@ -168,9 +189,7 @@ export default function ChatWidget() {
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/60 to-slate-900/40" />
 
-                            {/* Header Content */}
                             <div className="relative h-full w-full flex flex-col p-6 z-10">
-                                {/* Top Toolbar */}
                                 <div className="flex justify-between items-start mb-auto">
                                     <button
                                         onClick={clearChat}
@@ -186,15 +205,11 @@ export default function ChatWidget() {
                                     </button>
                                 </div>
 
-                                {/* Main Title Area */}
                                 <div className="space-y-1">
                                     <div className="flex items-center gap-2">
                                         <div className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
                                         <span className="text-[10px] font-black tracking-[0.2em] text-white/70 uppercase">
                                             Laboratory Secure Uplink
-                                        </span>
-                                        <span className="px-1.5 py-0.5 rounded text-[8px] font-black bg-slate-100/10 text-white/50 border border-white/10 ml-1">
-                                            1K RES
                                         </span>
                                     </div>
                                     <h2 className="text-3xl font-bold text-white tracking-tight">Dr. Aris</h2>
@@ -207,7 +222,6 @@ export default function ChatWidget() {
 
                         {/* Messages Area */}
                         <div className="flex-1 overflow-y-auto px-6 py-8 custom-scrollbar relative">
-                            {/* Side Grid Pattern (subtle) */}
                             <div className="absolute right-0 top-0 bottom-0 w-24 opacity-[0.03] pointer-events-none overflow-hidden">
                                 <div className="h-full w-full bg-[linear-gradient(to_right,#000_1px,transparent_1px)] bg-[size:20px_100%]" />
                             </div>
@@ -228,13 +242,7 @@ export default function ChatWidget() {
                                                 components={{
                                                     a: ({ node, ...props }) => {
                                                         const href = props.href?.toLowerCase() || '';
-                                                        const isUnsafe = href.startsWith('javascript:') || href.startsWith('data:') || href.startsWith('vbscript:');
-                                                        const isSDS = !isUnsafe && (
-                                                            props.children?.toString().toLowerCase().includes('sds') ||
-                                                            href.endsWith('.pdf') ||
-                                                            href.includes('grounding')
-                                                        );
-
+                                                        const isSDS = href.endsWith('.pdf') || href.includes('grounding');
                                                         if (isSDS) {
                                                             return (
                                                                 <a
@@ -249,7 +257,6 @@ export default function ChatWidget() {
                                                                 </a>
                                                             );
                                                         }
-
                                                         return (
                                                             <a
                                                                 {...props}
@@ -285,7 +292,7 @@ export default function ChatWidget() {
                         </div>
 
                         {/* Input Area */}
-                        <div className="p-6 pb-6 bg-white">
+                        <div className="p-6 pb-6 bg-white shrink-0 border-t border-slate-100">
                             <form onSubmit={handleSubmit} className="relative group mb-4">
                                 <input
                                     type="text"
@@ -303,37 +310,26 @@ export default function ChatWidget() {
                                 </button>
                             </form>
 
-                            {/* Security Footer */}
-                            <div className="flex flex-col items-center justify-center gap-2">
+                            <div className="flex flex-col items-center justify-center gap-2 opacity-50">
                                 <div className="flex items-center gap-2">
-                                    <span className="text-[9px] font-black tracking-[0.2em] text-slate-300 uppercase">
+                                    <span className="text-[9px] font-black tracking-[0.2em] text-slate-400 uppercase">
                                         ISO-27001 Data Vault
                                     </span>
-                                    <div className="h-1 w-1 rounded-full bg-slate-200" />
-                                    <span className="text-[9px] font-black tracking-[0.2em] text-slate-300 uppercase">
+                                    <div className="h-1 w-1 rounded-full bg-slate-300" />
+                                    <span className="text-[9px] font-black tracking-[0.2em] text-slate-400 uppercase">
                                         Quantum SSL V3
                                     </span>
                                 </div>
                                 <p className="text-[9px] text-slate-400 font-medium text-center px-4 leading-tight">
-                                    AI-generated for informational use. The product label and SDS are the final authorities on safety and usage. Always verify with our team before proceeding.
+                                    AI-generated for informational use. Always verify with the SDS.
                                 </p>
                             </div>
                         </div>
 
                         <style jsx>{`
-                            .custom-scrollbar::-webkit-scrollbar {
-                                width: 4px;
-                            }
-                            .custom-scrollbar::-webkit-scrollbar-track {
-                                background: transparent;
-                            }
-                            .custom-scrollbar::-webkit-scrollbar-thumb {
-                                background: #e2e8f0;
-                                border-radius: 10px;
-                            }
-                            .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                                background: #cbd5e1;
-                            }
+                            .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+                            .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+                            .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
                         `}</style>
                     </motion.div>
                 )}
